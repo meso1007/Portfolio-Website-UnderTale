@@ -1,0 +1,33 @@
+export enum ViewState {
+  INTRO = 'INTRO',
+  FIGHT = 'FIGHT', // Projects
+  ACT = 'ACT',     // Skills
+  ITEM = 'ITEM',   // Experience/Resume
+  MERCY = 'MERCY', // Contact
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  tech: string[];
+  stats: {
+    atk: number; // Complexity
+    def: number; // Maintenance
+  };
+  link?: string;
+}
+
+export interface Skill {
+  name: string;
+  level: number; // 1-20
+  description: string;
+  type: 'FRONT' | 'BACK' | 'TOOL';
+}
+
+export interface Experience {
+  role: string;
+  company: string;
+  year: string;
+  description: string;
+}

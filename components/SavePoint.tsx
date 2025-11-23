@@ -4,10 +4,13 @@ import { playSave, playMenuMove, playConfirm, playSelect } from '../utils/sound'
 import { Typewriter } from './Typewriter';
 import { GuestbookEntry } from '../types';
 
-// Mock Initial Data
+// API Configuration
+const API_URL = 'http://localhost:8080/api/guestbook';
+
+// Mock Initial Data for fallback
 const INITIAL_ENTRIES: GuestbookEntry[] = [
-  { id: 1, name: "Papyrus", message: "NYEH HEH HEH!", date: "202X-01-01" },
-  { id: 2, name: "Sans", message: "cool website. i guess.", date: "202X-01-02" },
+  { id: 1, name: "PAPYRUS", message: "NYEH HEH HEH!", date: "202X-01-01" },
+  { id: 2, name: "SANS", message: "cool website. i guess.", date: "202X-01-02" },
 ];
 
 export const SavePoint: React.FC = () => {
@@ -16,31 +19,81 @@ export const SavePoint: React.FC = () => {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [view, setView] = useState<'MENU' | 'GUESTBOOK'>('MENU');
+  
+  // Connection State
+  const [isOffline, setIsOffline] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Simulate fetching from Go backend on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('undertale_guestbook');
-    if (saved) {
-      setEntries(JSON.parse(saved));
+  // Fetch Logic: Try API first, fallback to LocalStorage
+  const fetchEntries = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error("API Error");
+      const data = await res.json();
+      setEntries(data);
+      setIsOffline(false);
+    } catch (e) {
+      console.log("Backend not reachable, switching to Offline Mode (LocalStorage).");
+      setIsOffline(true);
+      const saved = localStorage.getItem('undertale_guestbook');
+      if (saved) {
+        setEntries(JSON.parse(saved));
+      }
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchEntries();
   }, []);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !message) return;
 
     playSave();
     
-    const newEntry: GuestbookEntry = {
-      id: Date.now(),
-      name: name.toUpperCase(), // Undertale style
+    const newEntryPayload = {
+      name: name.toUpperCase(), 
       message,
+      // Date is set by server, but we set it here for optimistic UI/Offline mode
       date: new Date().toISOString().split('T')[0]
     };
 
-    const newEntries = [newEntry, ...entries].slice(0, 10); // Keep last 10
-    setEntries(newEntries);
-    localStorage.setItem('undertale_guestbook', JSON.stringify(newEntries));
+    let success = false;
+
+    // Try API if online
+    if (!isOffline) {
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newEntryPayload)
+        });
+        if (res.ok) {
+          success = true;
+          await fetchEntries(); // Refresh list from server
+        } else {
+          throw new Error("Save failed");
+        }
+      } catch (e) {
+        setIsOffline(true); // Fallback to offline if request fails
+      }
+    }
+
+    // Offline / Fallback Logic
+    if (isOffline || !success) {
+      const localEntry: GuestbookEntry = {
+        id: Date.now(),
+        ...newEntryPayload
+      };
+      const newEntries = [localEntry, ...entries].slice(0, 20);
+      setEntries(newEntries);
+      localStorage.setItem('undertale_guestbook', JSON.stringify(newEntries));
+    }
     
     setName("");
     setMessage("");
@@ -50,6 +103,7 @@ export const SavePoint: React.FC = () => {
   const handleOpen = () => {
     playSave();
     setIsOpen(true);
+    fetchEntries(); // Refresh on open
   };
 
   const handleClose = () => {
@@ -83,7 +137,7 @@ export const SavePoint: React.FC = () => {
                   {view === 'MENU' ? 'SAVE POINT' : 'GUESTBOOK'}
                </span>
                <span className="font-pixel text-gray-400 text-sm">
-                 {view === 'MENU' ? 'LV 19' : `${entries.length} ENTRIES`}
+                 {view === 'MENU' ? 'LV 19' : `${entries.length} RECORDS`}
                </span>
             </div>
 
@@ -92,6 +146,12 @@ export const SavePoint: React.FC = () => {
                 <div className="font-pixel text-xl leading-relaxed">
                   <Typewriter text="* Seeing the clean code fills you with DETERMINATION." speed={20} />
                 </div>
+                
+                {/* Status Indicator */}
+                <div className="text-xs font-pixel text-gray-500 text-center">
+                  * STATUS: <span className={isOffline ? 'text-ut-red' : 'text-green-400'}>{isOffline ? 'LOCAL MODE' : 'SERVER ONLINE'}</span>
+                </div>
+
                 <div className="flex justify-between gap-4 mt-8">
                    <button 
                     onClick={() => { playConfirm(); setView('GUESTBOOK'); }}
@@ -107,9 +167,6 @@ export const SavePoint: React.FC = () => {
                    >
                      RETURN
                    </button>
-                </div>
-                <div className="text-center text-xs font-pixel text-gray-500 mt-4">
-                  * (Connected to Backend API: Local Mode)
                 </div>
               </div>
             )}
@@ -142,22 +199,25 @@ export const SavePoint: React.FC = () => {
                     </div>
                     <button 
                       type="submit"
-                      disabled={!name || !message}
-                      className="w-full bg-ut-yellow text-black font-8bit py-2 text-xs disabled:opacity-50 hover:opacity-90"
+                      disabled={!name || !message || isLoading}
+                      className="w-full bg-ut-yellow text-black font-8bit py-2 text-xs disabled:opacity-50 hover:opacity-90 transition-opacity"
                     >
-                      SAVE RECORD
+                      {isLoading ? "SAVING..." : "SAVE RECORD"}
                     </button>
                  </form>
 
                  {/* List */}
                  <div className="flex-1 overflow-y-auto custom-scrollbar border-t border-white/20 pt-4 space-y-4">
+                    {isLoading && entries.length === 0 && (
+                      <div className="text-center font-pixel text-gray-500 animate-pulse">* Loading...</div>
+                    )}
                     {entries.map(entry => (
-                      <div key={entry.id} className="font-pixel">
-                         <div className="flex justify-between text-ut-yellow text-sm">
+                      <div key={entry.id} className="font-pixel group">
+                         <div className="flex justify-between text-ut-yellow text-sm group-hover:text-white transition-colors">
                             <span>{entry.name}</span>
                             <span className="text-gray-500 text-xs">{entry.date}</span>
                          </div>
-                         <div className="text-white pl-2 border-l-2 border-gray-800 ml-1 mt-1">
+                         <div className="text-white pl-2 border-l-2 border-gray-800 ml-1 mt-1 break-words">
                            {entry.message}
                          </div>
                       </div>
@@ -167,6 +227,7 @@ export const SavePoint: React.FC = () => {
                  <button 
                    onClick={() => setView('MENU')}
                    className="mt-4 text-gray-400 hover:text-white font-pixel text-sm text-center"
+                   onMouseEnter={() => playMenuMove()}
                  >
                    [ BACK ]
                  </button>

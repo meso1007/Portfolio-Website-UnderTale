@@ -1,3 +1,4 @@
+
 import { Project, Skill, Experience } from './types';
 
 export const PROJECTS: Project[] = [
@@ -8,6 +9,7 @@ export const PROJECTS: Project[] = [
     tech: ['React', 'Node.js', 'Stripe'],
     stats: { atk: 15, def: 10 },
     link: '#',
+    image: 'https://images.unsplash.com/photo-1557821552-17105176677c?w=800&q=80',
   },
   {
     id: 'p2',
@@ -16,6 +18,7 @@ export const PROJECTS: Project[] = [
     tech: ['TypeScript', 'Firebase'],
     stats: { atk: 8, def: 20 },
     link: '#',
+    image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&q=80',
   },
   {
     id: 'p3',
@@ -24,6 +27,7 @@ export const PROJECTS: Project[] = [
     tech: ['Python', 'OpenAI', 'Socket.io'],
     stats: { atk: 99, def: 5 },
     link: '#',
+    image: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800&q=80',
   },
 ];
 
@@ -50,11 +54,11 @@ export const HISTORY: Experience[] = [
   },
 ];
 
-export const PLAYER_NAME = "HUMAN";
+export const PLAYER_NAME = "SHOYA";
 export const PLAYER_ROLE = "WEB DEVELOPER";
 export const PLAYER_LOCATION = "TOKYO, NET";
 export const PLAYER_LV = 19;
-export const PLAYER_HP = "92/92";
+export const PLAYER_HP = "101/101";
 
 // Intro "Check" stats
 export const PLAYER_TRAITS = [

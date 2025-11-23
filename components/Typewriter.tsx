@@ -1,17 +1,21 @@
+
 import React, { useState, useEffect, useRef } from 'react';
+import { playText } from '../utils/sound';
 
 interface TypewriterProps {
   text: string;
   speed?: number;
   onComplete?: () => void;
   className?: string;
+  enableSound?: boolean;
 }
 
 export const Typewriter: React.FC<TypewriterProps> = ({ 
   text, 
   speed = 30, 
   onComplete,
-  className = ""
+  className = "",
+  enableSound = true
 }) => {
   const [displayedText, setDisplayedText] = useState('');
   const indexRef = useRef(0);
@@ -25,8 +29,14 @@ export const Typewriter: React.FC<TypewriterProps> = ({
     
     timerRef.current = window.setInterval(() => {
       if (indexRef.current < text.length) {
-        setDisplayedText((prev) => prev + text.charAt(indexRef.current));
+        const char = text.charAt(indexRef.current);
+        setDisplayedText((prev) => prev + char);
         indexRef.current += 1;
+        
+        // Play sound for non-space characters if enabled
+        if (enableSound && char.trim() !== '') {
+          playText();
+        }
       } else {
         if (timerRef.current) window.clearInterval(timerRef.current);
         if (onComplete) onComplete();
@@ -36,7 +46,7 @@ export const Typewriter: React.FC<TypewriterProps> = ({
     return () => {
       if (timerRef.current) window.clearInterval(timerRef.current);
     };
-  }, [text, speed, onComplete]);
+  }, [text, speed, onComplete, enableSound]);
 
   return (
     <span className={`font-pixel text-xl md:text-2xl leading-relaxed whitespace-pre-wrap ${className}`}>

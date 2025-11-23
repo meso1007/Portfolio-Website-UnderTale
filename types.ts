@@ -16,6 +16,7 @@ export interface Project {
     def: number; // Maintenance
   };
   link?: string;
+  image?: string; // Optional image URL
 }
 
 export interface Skill {

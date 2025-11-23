@@ -1,17 +1,19 @@
+
 import React from 'react';
 import { HISTORY } from '../constants';
 import { SoulHeart } from '../components/SoulHeart';
+import { playMenuMove, playSave } from '../utils/sound';
 
 export const ItemView: React.FC = () => {
   return (
-    <div className="h-full">
+    <div className="h-full flex flex-col">
        <div className="mb-6 font-pixel text-gray-400">
         * You opened your INVENTORY.
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 overflow-y-auto custom-scrollbar pr-2">
         {HISTORY.map((item, idx) => (
-          <div key={idx} className="flex gap-4 group">
+          <div key={idx} className="flex gap-4 group" onMouseEnter={() => playMenuMove()}>
             <div className="pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                <SoulHeart />
             </div>
@@ -28,8 +30,12 @@ export const ItemView: React.FC = () => {
           </div>
         ))}
         
-        <div className="mt-8 border-t border-white/20 pt-4">
-           <div className="flex gap-4 group cursor-pointer">
+        <div className="mt-8 border-t border-white/20 pt-4 pb-4">
+           <div 
+             className="flex gap-4 group cursor-pointer" 
+             onMouseEnter={() => playMenuMove()}
+             onClick={() => playSave()}
+           >
              <div className="pt-1 opacity-0 group-hover:opacity-100">
                <SoulHeart />
              </div>

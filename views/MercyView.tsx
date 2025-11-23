@@ -1,11 +1,14 @@
+
 import React, { useState } from 'react';
 import { SoulHeart } from '../components/SoulHeart';
 import { Typewriter } from '../components/Typewriter';
+import { playConfirm, playMenuMove } from '../utils/sound';
 
 export const MercyView: React.FC = () => {
   const [spared, setSpared] = useState(false);
 
   const handleSpare = () => {
+    playConfirm();
     setSpared(true);
   };
 
@@ -22,7 +25,11 @@ export const MercyView: React.FC = () => {
         <p className="font-pixel text-gray-400">
           (The developer has been notified of your mercy. Or you can just email them.)
         </p>
-        <a href="mailto:hello@example.com" className="mt-8 font-8bit border-2 border-white px-4 py-2 hover:bg-white hover:text-black transition-colors">
+        <a 
+          href="mailto:hello@example.com" 
+          className="mt-8 font-8bit border-2 border-white px-4 py-2 hover:bg-white hover:text-black transition-colors"
+          onMouseEnter={() => playMenuMove()}
+        >
           SEND EMAIL
         </a>
       </div>
@@ -35,10 +42,14 @@ export const MercyView: React.FC = () => {
         <Typewriter text="* The developer is waiting for your input." />
       </div>
 
-      <div className="flex flex-col gap-4 mt-8">
+      <div className="flex flex-col gap-4 mt-8 overflow-y-auto custom-scrollbar">
         <div className="font-pixel text-gray-400 mb-2">* What will you do?</div>
         
-        <a href="mailto:hello@example.com" className="group flex items-center gap-4 text-xl cursor-pointer">
+        <a 
+          href="mailto:hello@example.com" 
+          className="group flex items-center gap-4 text-xl cursor-pointer"
+          onMouseEnter={() => playMenuMove()}
+        >
            <div className="w-6 opacity-0 group-hover:opacity-100">
              <SoulHeart />
            </div>
@@ -47,7 +58,13 @@ export const MercyView: React.FC = () => {
            </span>
         </a>
 
-        <a href="https://github.com" target="_blank" rel="noreferrer" className="group flex items-center gap-4 text-xl cursor-pointer">
+        <a 
+          href="https://github.com" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="group flex items-center gap-4 text-xl cursor-pointer"
+          onMouseEnter={() => playMenuMove()}
+        >
            <div className="w-6 opacity-0 group-hover:opacity-100">
              <SoulHeart />
            </div>
@@ -56,7 +73,13 @@ export const MercyView: React.FC = () => {
            </span>
         </a>
 
-        <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="group flex items-center gap-4 text-xl cursor-pointer">
+        <a 
+          href="https://linkedin.com" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="group flex items-center gap-4 text-xl cursor-pointer"
+          onMouseEnter={() => playMenuMove()}
+        >
            <div className="w-6 opacity-0 group-hover:opacity-100">
              <SoulHeart />
            </div>
@@ -65,7 +88,11 @@ export const MercyView: React.FC = () => {
            </span>
         </a>
 
-        <button onClick={handleSpare} className="group flex items-center gap-4 text-xl cursor-pointer mt-8 text-ut-yellow">
+        <button 
+          onClick={handleSpare} 
+          className="group flex items-center gap-4 text-xl cursor-pointer mt-8 text-ut-yellow"
+          onMouseEnter={() => playMenuMove()}
+        >
            <div className="w-6 opacity-0 group-hover:opacity-100">
              <SoulHeart />
            </div>

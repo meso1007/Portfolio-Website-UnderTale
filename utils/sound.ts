@@ -76,60 +76,10 @@ export const playEncounter = () => {
   lfo.stop(t + 0.4);
 };
 
-// 2. The Battle Start Swoosh
-export const playBattleStart = () => {
-  const ctx = getAudioContext();
-  if (!ctx) return;
-  
-  const t = ctx.currentTime;
-            
-  // Noise component
-  const bufferSize = ctx.sampleRate * 1.0;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1);
-  }
-  
-  const noise = ctx.createBufferSource();
-  noise.buffer = buffer;
-  const noiseGain = ctx.createGain();
-  const noiseFilter = ctx.createBiquadFilter();
-
-  noiseFilter.type = 'lowpass';
-  noiseFilter.frequency.setValueAtTime(1000, t);
-  noiseFilter.frequency.exponentialRampToValueAtTime(100, t + 0.8); // Close filter
-
-  noiseGain.gain.setValueAtTime(0.5, t);
-  noiseGain.gain.linearRampToValueAtTime(0, t + 0.8);
-
-  noise.connect(noiseFilter);
-  noiseFilter.connect(noiseGain);
-  noiseGain.connect(ctx.destination);
-  noise.start(t);
-
-  // Tone component (Falling pitch)
-  const swooshOsc = ctx.createOscillator();
-  const swooshGain = ctx.createGain();
-  
-  swooshOsc.type = 'square';
-  swooshOsc.frequency.setValueAtTime(800, t);
-  swooshOsc.frequency.exponentialRampToValueAtTime(50, t + 0.8); // Drop pitch
-
-  swooshGain.gain.setValueAtTime(0.2, t);
-  swooshGain.gain.linearRampToValueAtTime(0, t + 0.8);
-
-  swooshOsc.connect(swooshGain);
-  swooshGain.connect(ctx.destination);
-  swooshOsc.start(t);
-  swooshOsc.stop(t + 0.8);
-};
-
 // Combined Sequence
 export const playEncounterSequence = async () => {
   await ensureContext();
   playEncounter();
-  // Removed playBattleStart call as requested
 };
 
 // 3. Select/Decision Sound (Piko)
@@ -309,5 +259,53 @@ export const playDamage = () => {
     noise.connect(noiseGain);
     noiseGain.connect(ctx.destination);
     noise.start(now);
+  });
+};
+
+// 10. Heal Sound (Pacifist)
+export const playHeal = () => {
+  ensureContext().then(ctx => {
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.linearRampToValueAtTime(880, now + 0.2);
+    
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+  });
+};
+
+// 11. Glitch Sound (Genocide)
+export const playGlitch = () => {
+  ensureContext().then(ctx => {
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const bufferSize = ctx.sampleRate * 0.2;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+      if (i % 20 === 0) data[i] *= 2; // Spikes
+    }
+    
+    const node = ctx.createBufferSource();
+    node.buffer = buffer;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+    
+    node.connect(gain);
+    gain.connect(ctx.destination);
+    node.start(now);
   });
 };

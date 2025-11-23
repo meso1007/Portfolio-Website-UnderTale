@@ -6,6 +6,12 @@ export enum ViewState {
   MERCY = 'MERCY', // Contact
 }
 
+export enum GameRoute {
+  NEUTRAL = 'NEUTRAL',
+  PACIFIST = 'PACIFIST',
+  GENOCIDE = 'GENOCIDE'
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -31,4 +37,11 @@ export interface Experience {
   company: string;
   year: string;
   description: string;
+}
+
+export interface GuestbookEntry {
+  id: number;
+  name: string;
+  message: string;
+  date: string;
 }

@@ -1,6 +1,7 @@
 
+
 import React, { useState, useEffect } from 'react';
-import { ViewState } from './types';
+import { ViewState, GameRoute } from './types';
 import { PLAYER_NAME, PLAYER_LV, PLAYER_ROLE, PLAYER_LOCATION, PLAYER_TRAITS } from './constants';
 import { BattleButton } from './components/BattleButton';
 import { DialogueBox } from './components/DialogueBox';
@@ -9,8 +10,9 @@ import { ActView } from './views/ActView';
 import { ItemView } from './views/ItemView';
 import { MercyView } from './views/MercyView';
 import { Typewriter } from './components/Typewriter';
-import { playCancel, playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave } from './utils/sound';
+import { playCancel, playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch } from './utils/sound';
 import { SoulHeart } from './components/SoulHeart';
+import { SavePoint } from './components/SavePoint';
 
 const MAX_HP = 101;
 const DAMAGE_PER_HIT = 25;
@@ -36,7 +38,12 @@ const App: React.FC = () => {
   const [currentHpValue, setCurrentHpValue] = useState(MAX_HP);
   const [isAttacked, setIsAttacked] = useState(false);
   const [damageMsg, setDamageMsg] = useState("");
-  const [isGameOver, setIsGameOver] = useState(false);
+  
+  // Route State
+  const [gameRoute, setGameRoute] = useState<GameRoute>(GameRoute.NEUTRAL);
+
+  const isGenocide = gameRoute === GameRoute.GENOCIDE;
+  const isPacifist = gameRoute === GameRoute.PACIFIST;
 
   const handleStart = async () => {
     // Resume audio context on first user interaction
@@ -48,13 +55,13 @@ const App: React.FC = () => {
 
   // Simulate intro animation timeline
   useEffect(() => {
-    if (hasStarted && view === ViewState.INTRO && !showControls && !isGameOver) {
+    if (hasStarted && view === ViewState.INTRO && !showControls && gameRoute !== GameRoute.GENOCIDE) {
       const timer = setTimeout(() => {
         setShowControls(true);
       }, 2500); 
       return () => clearTimeout(timer);
     }
-  }, [hasStarted, view, showControls, isGameOver]);
+  }, [hasStarted, view, showControls, gameRoute]);
 
   const handleImageError = () => {
     setAvatarUrl(`https://api.dicebear.com/9.x/pixel-art/svg?seed=${PLAYER_NAME}`);
@@ -68,6 +75,8 @@ const App: React.FC = () => {
   };
 
   const handleAttack = () => {
+    if (isGenocide) return;
+
     // Pick a random pain
     const pain = WEB_DEV_PAINS[Math.floor(Math.random() * WEB_DEV_PAINS.length)];
     setDamageMsg(pain);
@@ -79,10 +88,12 @@ const App: React.FC = () => {
     setCurrentHpValue(newHp);
 
     if (newHp <= 0) {
-      // Delay Game Over slightly to show the hit
+      // Trigger GENOCIDE Route
       setTimeout(() => {
-        setIsGameOver(true);
-        setShowControls(false);
+        setGameRoute(GameRoute.GENOCIDE);
+        playGlitch();
+        setShowControls(true); // Keep controls shown in Genocide
+        setView(ViewState.INTRO);
       }, 1000);
     }
     
@@ -94,12 +105,15 @@ const App: React.FC = () => {
 
   const handleRetry = () => {
     playSave();
-    setIsGameOver(false);
+    setGameRoute(GameRoute.NEUTRAL);
     setCurrentHpValue(MAX_HP);
     setView(ViewState.INTRO);
-    // Re-trigger intro sequence
     playEncounterSequence();
     setShowControls(false);
+  };
+
+  const handlePacifistTrigger = () => {
+    setGameRoute(GameRoute.PACIFIST);
   };
 
   const renderContent = () => {
@@ -112,60 +126,78 @@ const App: React.FC = () => {
                <div className="flex flex-col items-center gap-6 shrink-0 mx-auto md:mx-0">
                  <div className="relative group">
                    <div 
-                      className={`w-32 h-32 md:w-40 md:h-40 relative border-4 border-white bg-black p-2 transition-all duration-75`}
+                      className={`w-32 h-32 md:w-40 md:h-40 relative border-4 ${isGenocide ? 'border-ut-red' : 'border-white'} bg-black p-2 transition-all duration-75`}
                       style={{
                         filter: isAttacked ? 'sepia(1) saturate(5) hue-rotate(-50deg) contrast(1.5)' : 'none',
                         transform: isAttacked ? 'translateX(-4px)' : 'none'
                       }}
                    >
-                      <img 
-                        src={avatarUrl}
-                        onError={handleImageError}
-                        alt="Player Avatar"
-                        className={`w-full h-full object-contain ${!isAttacked ? 'animate-float' : ''}`}
-                        style={{ imageRendering: 'pixelated' }}
-                      />
+                      {/* Avatar logic: Disappear on Genocide, Happy on Pacifist */}
+                      {isGenocide ? (
+                         <div className="w-full h-full bg-black flex items-center justify-center">
+                           <span className="font-pixel text-ut-red text-xs animate-pulse">NO SIGNAL</span>
+                         </div>
+                      ) : (
+                        <img 
+                          src={avatarUrl}
+                          onError={handleImageError}
+                          alt="Player Avatar"
+                          className={`w-full h-full object-contain ${!isAttacked ? 'animate-float' : ''}`}
+                          style={{ 
+                            imageRendering: 'pixelated',
+                            filter: isPacifist ? 'brightness(1.2) sepia(0.2)' : 'none' 
+                          }}
+                        />
+                      )}
                    </div>
                    {/* Name Tag */}
-                   <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-black border-2 border-white px-3 py-1 whitespace-nowrap z-10">
-                      <span className="font-8bit text-xs text-ut-yellow uppercase">{PLAYER_ROLE}</span>
+                   <div className={`absolute -bottom-4 left-1/2 -translate-x-1/2 bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-3 py-1 whitespace-nowrap z-10`}>
+                      <span className={`font-8bit text-xs ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
+                        {isGenocide ? 'ENEMY' : PLAYER_ROLE}
+                      </span>
                    </div>
                  </div>
 
-                 {/* FIGHT Button - Smooth Reveal */}
-                 <div className={`w-full overflow-hidden transition-all duration-1000 ease-out ${showControls ? 'opacity-100 max-h-20 mt-2' : 'opacity-0 max-h-0 mt-0'}`}>
-                   <button 
-                     onClick={handleAttack}
-                     className="border-2 border-ut-red px-6 py-2 hover:bg-ut-red group transition-colors flex items-center justify-center gap-2 w-full"
-                     onMouseEnter={() => playMenuMove()}
-                     tabIndex={showControls ? 0 : -1}
-                   >
-                     <span className="font-8bit text-ut-red group-hover:text-black text-sm md:text-base tracking-widest">
-                       ⚔ FIGHT
-                     </span>
-                   </button>
-                 </div>
+                 {/* FIGHT Button */}
+                 {!isGenocide && !isPacifist && (
+                   <div className={`w-full overflow-hidden transition-all duration-1000 ease-out ${showControls ? 'opacity-100 max-h-20 mt-2' : 'opacity-0 max-h-0 mt-0'}`}>
+                     <button 
+                       onClick={handleAttack}
+                       className="border-2 border-ut-red px-6 py-2 hover:bg-ut-red group transition-colors flex items-center justify-center gap-2 w-full"
+                       onMouseEnter={() => playMenuMove()}
+                       tabIndex={showControls ? 0 : -1}
+                     >
+                       <span className="font-8bit text-ut-red group-hover:text-black text-sm md:text-base tracking-widest">
+                         ⚔ FIGHT
+                       </span>
+                     </button>
+                   </div>
+                 )}
                </div>
 
                {/* Stats / Bio Section */}
                <div className="flex-1 space-y-4 max-w-md w-full pt-2">
-                  <div className="border-b border-white/20 pb-2">
-                    <h1 className="font-8bit text-2xl md:text-3xl text-ut-yellow mb-2">
-                      {PLAYER_NAME}
+                  <div className={`border-b ${isGenocide ? 'border-ut-red' : 'border-white/20'} pb-2`}>
+                    <h1 className={`font-8bit text-2xl md:text-3xl ${isGenocide ? 'text-ut-red animate-glitch' : 'text-ut-yellow'} mb-2`}>
+                      {isGenocide ? 'UNKNOWN' : PLAYER_NAME}
                     </h1>
-                    <div className="flex justify-between font-pixel text-gray-400 text-sm md:text-base">
-                      <span>LV {PLAYER_LV}</span>
-                      <span>LOC: {PLAYER_LOCATION}</span>
+                    <div className={`flex justify-between font-pixel ${isGenocide ? 'text-ut-red' : 'text-gray-400'} text-sm md:text-base`}>
+                      <span>{isGenocide ? 'LV 99' : `LV ${PLAYER_LV}`}</span>
+                      <span>{isGenocide ? 'LOC: VOID' : `LOC: ${PLAYER_LOCATION}`}</span>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    {PLAYER_TRAITS.map((trait, index) => (
+                    {isGenocide ? (
+                       <div className="font-pixel text-ut-red animate-pulse">
+                         * DETERMINATION EXTRACTED.<br/>
+                         * FILE CORRUPTED.
+                       </div>
+                    ) : PLAYER_TRAITS.map((trait, index) => (
                       <div key={index} className="flex items-start gap-3">
                         <div className="pt-1.5 shrink-0">
                           <div className="w-1.5 h-1.5 bg-white animate-pulse"></div>
                         </div>
-                        {/* NO SOUND for traits */}
                         <Typewriter 
                           text={trait} 
                           speed={30} 
@@ -179,7 +211,6 @@ const App: React.FC = () => {
              </div>
              
              <div className="text-center border-t-2 border-dashed border-gray-700 pt-4 mt-auto min-h-[80px] flex flex-col justify-center">
-               {/* SOUND ENABLED for encounter message */}
                {isAttacked ? (
                   <div className="flex flex-col items-center animate-pulse">
                     <span className="font-pixel text-ut-red text-lg md:text-xl whitespace-nowrap">
@@ -191,9 +222,12 @@ const App: React.FC = () => {
                   </div>
                ) : (
                  <Typewriter 
-                    text={`* You encountered a wild developer!`} 
+                    text={isGenocide 
+                      ? "* (The developer turned to dust.)" 
+                      : (isPacifist ? "* The developer is happy!" : "* You encountered a wild developer!")
+                    } 
                     speed={40}
-                    className="text-ut-gray font-pixel"
+                    className={`font-pixel ${isGenocide ? 'text-ut-red' : 'text-ut-gray'}`}
                     enableSound={true}
                  />
                )}
@@ -201,13 +235,13 @@ const App: React.FC = () => {
           </div>
         );
       case ViewState.FIGHT:
-        return <FightView />;
+        return <FightView route={gameRoute} />;
       case ViewState.ACT:
-        return <ActView />;
+        return <ActView route={gameRoute} />;
       case ViewState.ITEM:
         return <ItemView />;
       case ViewState.MERCY:
-        return <MercyView />;
+        return <MercyView route={gameRoute} onPacifistTrigger={handlePacifistTrigger} />;
       default:
         return null;
     }
@@ -228,67 +262,48 @@ const App: React.FC = () => {
     );
   }
 
-  // Game Over Screen Overlay
-  if (isGameOver) {
-    return (
-      <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center z-50">
-        <div className="flex flex-col items-center animate-pulse">
-           {/* Broken Heart Visual */}
-           <div className="relative mb-8">
-             <SoulHeart className="w-24 h-24 text-ut-gray/50" />
-             <div className="absolute inset-0 flex items-center justify-center">
-               <div className="w-1 h-24 bg-black rotate-12 transform translate-x-1"></div>
-             </div>
-           </div>
-           
-           <h1 className="font-8bit text-4xl md:text-6xl text-white mb-8 tracking-widest">GAME OVER</h1>
-           <p className="font-pixel text-gray-400 mb-12 text-center max-w-md">
-             It cannot end like this...<br/>
-             Stay determined!
-           </p>
-
-           <button 
-             onClick={handleRetry}
-             className="group flex items-center gap-4 border-2 border-white px-8 py-4 hover:bg-white transition-colors"
-             onMouseEnter={() => playMenuMove()}
-           >
-             <SoulHeart className="opacity-0 group-hover:opacity-100 text-ut-red fill-ut-red transition-opacity" />
-             <span className="font-8bit text-lg group-hover:text-black">CONTINUE</span>
-           </button>
-        </div>
-      </div>
-    );
-  }
+  // If Genocide reset is needed (Optional logic, but for now we stick to the requested "Glitch Theme")
+  // To reset from Genocide, the user can refresh or click the Name (which acts as reset).
 
   return (
     <div className={`min-h-screen bg-black text-white p-4 md:p-8 flex flex-col items-center justify-center font-sans ${isAttacked ? 'animate-shake' : ''}`}>
       
+      {/* SCANLINES OVERLAY for Genocide */}
+      {isGenocide && <div className="scanlines"></div>}
+
+      {/* Save Point (Guestbook) */}
+      <SavePoint />
+      
       {/* Main Container */}
-      <div className="w-full max-w-4xl flex flex-col gap-6">
+      <div className="w-full max-w-4xl flex flex-col gap-6 relative z-10">
         
-        {/* Top Stats Row - Smooth Reveal */}
+        {/* Top Stats Row */}
         <div className={`overflow-hidden transition-all duration-1000 ease-out ${showControls ? 'opacity-100 max-h-20 mb-4' : 'opacity-0 max-h-0 mb-0'}`}>
           <div className="flex flex-wrap justify-between items-center font-8bit text-xs md:text-sm px-2 select-none">
             <div className="flex gap-4 md:gap-8">
                <button 
                  onClick={handleHomeClick}
                  onMouseEnter={() => playMenuMove()}
-                 className="hover:text-ut-yellow transition-colors flex items-center gap-2 group cursor-pointer"
+                 className={`${isGenocide ? 'text-ut-red' : 'hover:text-ut-yellow'} transition-colors flex items-center gap-2 group cursor-pointer`}
                  title="Return to Intro"
                  tabIndex={showControls ? 0 : -1}
                >
-                 <span className="group-hover:animate-pulse underline decoration-dashed decoration-1 underline-offset-4">{PLAYER_NAME}</span>
+                 <span className="group-hover:animate-pulse underline decoration-dashed decoration-1 underline-offset-4">
+                   {isGenocide ? 'RESET' : PLAYER_NAME}
+                 </span>
                </button>
-               <span>LV {PLAYER_LV}</span>
+               <span className={isGenocide ? 'text-ut-red' : ''}>
+                 {isGenocide ? 'LV 99' : `LV ${PLAYER_LV}`}
+               </span>
             </div>
             <div className="flex items-center gap-2 md:gap-4">
-               <span className="text-xs">HP</span>
-               <div className="w-24 md:w-48 h-4 md:h-5 bg-ut-red flex items-center relative border-2 border-white/20">
+               <span className={`text-xs ${isGenocide ? 'text-ut-red' : ''}`}>HP</span>
+               <div className={`w-24 md:w-48 h-4 md:h-5 ${isGenocide ? 'bg-ut-red border-ut-red' : 'bg-ut-red border-white/20'} flex items-center relative border-2`}>
                   <div 
-                    className="absolute top-0 left-0 h-full bg-ut-yellow transition-all duration-300"
+                    className={`absolute top-0 left-0 h-full ${isGenocide ? 'bg-black' : 'bg-ut-yellow'} transition-all duration-300`}
                     style={{ width: `${Math.max(0, (currentHpValue / MAX_HP) * 100)}%` }}
                   ></div>
-                  <div className="z-10 text-[10px] text-black w-full text-center font-bold leading-none">
+                  <div className="z-10 text-[10px] text-white mix-blend-difference w-full text-center font-bold leading-none">
                     {Math.max(0, currentHpValue)} / {MAX_HP}
                   </div>
                </div>
@@ -297,35 +312,42 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Display Area */}
-        <DialogueBox title={view === ViewState.INTRO ? undefined : `MODE: ${view}`}>
-          {renderContent()}
-        </DialogueBox>
+        <div className={`relative w-full border-4 ${isGenocide ? 'border-ut-red animate-pulse' : 'border-white'} min-h-[300px] md:min-h-[400px] p-6 bg-black overflow-hidden`}>
+          {(view !== ViewState.INTRO) && (
+             <div className={`absolute top-0 left-0 ${isGenocide ? 'bg-ut-red text-black' : 'bg-white text-black'} px-2 py-1 font-8bit text-xs`}>
+                MODE: {isGenocide ? 'EXECUTION' : view}
+             </div>
+          )}
+          <div className="font-pixel text-xl md:text-2xl leading-loose text-white h-full overflow-y-auto pr-2 custom-scrollbar">
+            {renderContent()}
+          </div>
+        </div>
 
         {/* Control Menu */}
         <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 transition-opacity duration-1000 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <BattleButton 
-            label="PROJECTS" 
+            label={isGenocide ? "VICTIMS" : "PROJECTS"} 
             iconColor="text-ut-red"
             isActive={view === ViewState.FIGHT}
             onClick={() => setView(ViewState.FIGHT)}
             colorClass="text-ut-red"
           />
           <BattleButton 
-            label="SKILLS" 
+            label={isGenocide ? "EXP" : "SKILLS"} 
             iconColor="text-blue-400"
             isActive={view === ViewState.ACT}
             onClick={() => setView(ViewState.ACT)}
             colorClass="text-blue-400"
           />
           <BattleButton 
-            label="HISTORY" 
+            label={isGenocide ? "LV" : "HISTORY"} 
             iconColor="text-orange-400"
             isActive={view === ViewState.ITEM}
             onClick={() => setView(ViewState.ITEM)}
             colorClass="text-orange-400"
           />
           <BattleButton 
-            label="CONTACT" 
+            label={isGenocide ? "NOBODY" : "CONTACT"} 
             iconColor="text-ut-yellow"
             isActive={view === ViewState.MERCY}
             onClick={() => setView(ViewState.MERCY)}
@@ -333,11 +355,14 @@ const App: React.FC = () => {
           />
         </div>
         
-        {/* Footer Hint - Smooth Reveal */}
+        {/* Footer Hint */}
         <div className={`overflow-hidden transition-all duration-1000 ease-out ${showControls ? 'opacity-100 max-h-12 mt-8' : 'opacity-0 max-h-0 mt-0'}`}>
           <div className="text-center">
-             <p className="font-pixel text-gray-500 text-sm animate-pulse">
-               * (Click Name to Reset | Hover buttons to interact)
+             <p className={`font-pixel text-sm animate-pulse ${isGenocide ? 'text-ut-red' : 'text-gray-500'}`}>
+               {isGenocide 
+                  ? "* (Nothing left to see here.)" 
+                  : "* (Click Name to Reset | Look for the Star to Save)"
+               }
              </p>
           </div>
         </div>

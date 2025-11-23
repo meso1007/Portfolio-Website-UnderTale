@@ -1,36 +1,64 @@
 
+
 import React, { useState } from 'react';
 import { SoulHeart } from '../components/SoulHeart';
 import { Typewriter } from '../components/Typewriter';
-import { playConfirm, playMenuMove } from '../utils/sound';
+import { playConfirm, playMenuMove, playHeal } from '../utils/sound';
+import { GameRoute } from '../types';
 
-export const MercyView: React.FC = () => {
+interface MercyViewProps {
+  route: GameRoute;
+  onPacifistTrigger: () => void;
+}
+
+export const MercyView: React.FC<MercyViewProps> = ({ route, onPacifistTrigger }) => {
   const [spared, setSpared] = useState(false);
+  const isGenocide = route === GameRoute.GENOCIDE;
 
   const handleSpare = () => {
-    playConfirm();
+    if (isGenocide) return; // Cannot spare in genocide
+    playHeal(); // Pacifist sound
     setSpared(true);
+    onPacifistTrigger();
   };
+
+  if (isGenocide) {
+     return (
+      <div className="h-full flex flex-col items-center justify-center text-center">
+        <div className="animate-glitch text-ut-red font-pixel text-3xl mb-8">
+          * BUT NOBODY CAME.
+        </div>
+        {/* Still allow contact in Genocide, but it's scary */}
+        <a 
+          href="mailto:hello@example.com" 
+          className="font-8bit text-gray-600 hover:text-ut-red text-xs transition-colors"
+          onMouseEnter={() => playMenuMove()}
+        >
+          (send hate mail)
+        </a>
+      </div>
+     );
+  }
 
   if (spared) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center">
         <div className="mb-6 animate-float">
-           <SoulHeart className="w-16 h-16 text-ut-yellow fill-ut-yellow" />
+           <SoulHeart className="w-16 h-16 text-blue-300 fill-blue-300" />
         </div>
         <Typewriter 
-          text="* YOU WON! You gained 0 XP and 150 gold." 
-          className="text-ut-yellow text-center mb-4 block"
+          text="* YOU WON! The developer is now your friend." 
+          className="text-blue-300 text-center mb-4 block"
         />
-        <p className="font-pixel text-gray-400">
-          (The developer has been notified of your mercy. Or you can just email them.)
+        <p className="font-pixel text-white">
+          (They look ready to join your party / company.)
         </p>
         <a 
           href="mailto:hello@example.com" 
-          className="mt-8 font-8bit border-2 border-white px-4 py-2 hover:bg-white hover:text-black transition-colors"
+          className="mt-8 font-8bit border-2 border-white px-4 py-2 bg-white text-black hover:bg-blue-100 transition-colors animate-pulse"
           onMouseEnter={() => playMenuMove()}
         >
-          SEND EMAIL
+          HIRE NOW!
         </a>
       </div>
     );

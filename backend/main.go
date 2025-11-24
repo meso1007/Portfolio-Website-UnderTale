@@ -336,10 +336,7 @@ func main() {
 			"http://localhost:3000",
 			"http://localhost:3001",
 			"http://localhost:3002",
-			"https://*.vercel.app",
-			"https://*.netlify.app",
-			"https://*.onrender.com",
-			"https://*.github.io",
+			"https://portfolio-website-under-tail.vercel.app", // Add your specific Vercel URL
 		},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},

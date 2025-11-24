@@ -5,7 +5,9 @@ import { SoulHeart } from '../components/SoulHeart';
 import { Typewriter } from '../components/Typewriter';
 import { playConfirm, playMenuMove, playCancel } from '../utils/sound';
 
-const API_URL = 'http://localhost:8080/api/projects';
+import { API_ENDPOINTS } from '../config/api';
+
+const API_URL = API_ENDPOINTS.PROJECTS;
 
 interface FightViewProps {
   route: GameRoute;

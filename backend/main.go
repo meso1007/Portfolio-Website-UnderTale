@@ -331,7 +331,16 @@ func main() {
 
 	// CORS configuration for frontend
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "https://your-frontend-domain.com"},
+		AllowedOrigins: []string{
+			"http://localhost:5173",
+			"http://localhost:3000",
+			"http://localhost:3001",
+			"http://localhost:3002",
+			"https://*.vercel.app",
+			"https://*.netlify.app",
+			"https://*.onrender.com",
+			"https://*.github.io",
+		},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,

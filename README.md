@@ -190,6 +190,17 @@ The backend is configured for easy deployment to Render. See the comprehensive [
 
 The `render.yaml` file contains all necessary configuration for automatic deployment.
 
+### Deploy Frontend (Vercel)
+
+The frontend is optimized for deployment on Vercel.
+
+1. Push your code to GitHub
+2. Import project in Vercel
+3. Vercel will automatically detect Vite and configure build settings
+4. Deploy!
+
+The `vercel.json` file handles SPA routing configuration.
+
 ## 🎮 Easter Eggs & Secrets
 
 ### Secret Route

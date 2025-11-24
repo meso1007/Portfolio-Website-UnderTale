@@ -3,9 +3,10 @@ import { Star } from 'lucide-react';
 import { playSave, playMenuMove, playConfirm, playSelect } from '../utils/sound';
 import { Typewriter } from './Typewriter';
 import { GuestbookEntry } from '../types';
+import { API_ENDPOINTS } from '../config/api';
 
 // API Configuration
-const API_URL = 'http://localhost:8080/api/guestbook';
+const API_URL = API_ENDPOINTS.GUESTBOOK;
 
 // Mock Initial Data for fallback
 const INITIAL_ENTRIES: GuestbookEntry[] = [

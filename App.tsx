@@ -10,6 +10,7 @@ import { ActView } from './views/ActView';
 import { ItemView } from './views/ItemView';
 import { MercyView } from './views/MercyView';
 import { SecretView } from './views/SecretView';
+import pixelUser from './assets/pixel-user.png';
 import { Typewriter } from './components/Typewriter';
 import { playCancel, playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch } from './utils/sound';
 import { SoulHeart } from './components/SoulHeart';
@@ -108,7 +109,7 @@ const App: React.FC = () => {
   };
 
   // Avatar source - always use user's image
-  const avatarSrc = 'assets/pixel-user.png';
+  const avatarSrc = pixelUser;
 
   // Speech bubble for visit count
   const renderSpeechBubble = (

@@ -1,19 +1,70 @@
-
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Project, GameRoute } from '../types';
 import { PROJECTS } from '../constants';
 import { SoulHeart } from '../components/SoulHeart';
 import { Typewriter } from '../components/Typewriter';
 import { playConfirm, playMenuMove, playCancel } from '../utils/sound';
 
+const API_URL = 'http://localhost:8080/api/projects';
+
 interface FightViewProps {
   route: GameRoute;
 }
 
 export const FightView: React.FC<FightViewProps> = ({ route }) => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const isGenocide = route === GameRoute.GENOCIDE;
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        // Check cache first
+        const cachedData = localStorage.getItem('projects_cache');
+        const cacheTimestamp = localStorage.getItem('projects_cache_timestamp');
+        const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+
+        if (cachedData && cacheTimestamp) {
+          const age = Date.now() - parseInt(cacheTimestamp);
+          if (age < CACHE_DURATION) {
+            console.log('Using cached projects data');
+            const cached = JSON.parse(cachedData);
+            setProjects(cached);
+            setIsLoading(false);
+            return;
+          }
+        }
+
+        // Cache expired or doesn't exist, fetch from API
+        console.log('Fetching fresh data from API');
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+
+        console.log('Fetched data from API:', data);
+        console.log('Data length:', data?.length);
+
+        if (data && data.length > 0) {
+          console.log('Setting projects from API:', data);
+          setProjects(data);
+          // Save to cache
+          localStorage.setItem('projects_cache', JSON.stringify(data));
+          localStorage.setItem('projects_cache_timestamp', Date.now().toString());
+        } else {
+          console.log('Using fallback projects');
+          setProjects(PROJECTS);
+        }
+      } catch (e) {
+        console.error('Failed to fetch projects, using fallback:', e);
+        setProjects(PROJECTS);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const handleProjectClick = (p: Project) => {
     playConfirm();
@@ -24,6 +75,16 @@ export const FightView: React.FC<FightViewProps> = ({ route }) => {
     playCancel();
     setSelectedProject(null);
   };
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className={`font-pixel ${isGenocide ? 'text-ut-red' : 'text-white'} animate-pulse`}>
+          * Loading...
+        </div>
+      </div>
+    );
+  }
 
   if (selectedProject) {
     return (
@@ -37,24 +98,22 @@ export const FightView: React.FC<FightViewProps> = ({ route }) => {
             ATK {selectedProject.stats.atk} | DEF {selectedProject.stats.def}
           </div>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-12">
           {/* Project Image Frame - Smaller and Centered */}
-          {selectedProject.image && (
-            <div className="w-full flex justify-center mb-6">
-              <div className={`border-4 ${isGenocide ? 'border-ut-red' : 'border-white'} bg-gray-900 p-1 group relative overflow-hidden max-w-xs w-full`}>
-                <div className="aspect-video w-full overflow-hidden relative">
-                   <img 
-                    src={selectedProject.image} 
-                    alt={selectedProject.name}
-                    className={`w-full h-full object-cover ${isGenocide ? 'grayscale contrast-200 brightness-50' : 'grayscale group-hover:grayscale-0'} transition-all duration-500 ease-in-out`}
-                  />
-                  {/* Scanline effect overlay */}
-                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30"></div>
-                </div>
+          <div className="w-full flex justify-center mb-6">
+            <div className={`border-4 ${isGenocide ? 'border-ut-red' : 'border-white'} bg-gray-900 p-1 group relative overflow-hidden max-w-xs w-full`}>
+              <div className="aspect-video w-full overflow-hidden relative">
+                <img
+                  src={selectedProject.image || 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80'}
+                  alt={selectedProject.name}
+                  className={`w-full h-full object-cover ${isGenocide ? 'grayscale contrast-200 brightness-50' : 'grayscale group-hover:grayscale-0'} transition-all duration-500 ease-in-out`}
+                />
+                {/* Scanline effect overlay */}
+                <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] pointer-events-none opacity-30"></div>
               </div>
             </div>
-          )}
+          </div>
 
           <div className={`mb-4 font-pixel text-xl md:text-2xl ${isGenocide ? 'text-ut-red' : 'text-white'}`}>
             <Typewriter text={`* ${selectedProject.description}`} />
@@ -71,23 +130,25 @@ export const FightView: React.FC<FightViewProps> = ({ route }) => {
 
         {/* Action Buttons - Fixed at bottom */}
         <div className="flex gap-4 pt-4 border-t border-gray-800 mt-auto bg-black shrink-0">
-           <a 
-             href={selectedProject.link}
-             className={`flex items-center gap-2 ${isGenocide ? 'hover:text-ut-red' : 'hover:text-ut-yellow'} group cursor-pointer`}
-             onMouseEnter={() => playMenuMove()}
-             onClick={() => playConfirm()}
-           >
-             <SoulHeart className={`opacity-0 group-hover:opacity-100 transition-opacity ${isGenocide ? 'text-ut-red fill-ut-red' : ''}`} />
-             <span className="font-8bit text-sm underline decoration-2">CHECK SOURCE</span>
-           </a>
-           <button 
-             onClick={handleBack}
-             className={`flex items-center gap-2 ${isGenocide ? 'hover:text-ut-red' : 'hover:text-ut-yellow'} group ml-auto`}
-             onMouseEnter={() => playMenuMove()}
-           >
-             <SoulHeart className={`opacity-0 group-hover:opacity-100 transition-opacity ${isGenocide ? 'text-ut-red fill-ut-red' : ''}`} />
-             <span className="font-8bit text-sm">BACK</span>
-           </button>
+          <a
+            href={selectedProject.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`flex items-center gap-2 ${isGenocide ? 'hover:text-ut-red' : 'hover:text-ut-yellow'} group cursor-pointer`}
+            onMouseEnter={() => playMenuMove()}
+            onClick={() => playConfirm()}
+          >
+            <SoulHeart className={`opacity-0 group-hover:opacity-100 transition-opacity ${isGenocide ? 'text-ut-red fill-ut-red' : ''}`} />
+            <span className="font-8bit text-sm underline decoration-2">CHECK SOURCE</span>
+          </a>
+          <button
+            onClick={handleBack}
+            className={`flex items-center gap-2 ${isGenocide ? 'hover:text-ut-red' : 'hover:text-ut-yellow'} group ml-auto`}
+            onMouseEnter={() => playMenuMove()}
+          >
+            <SoulHeart className={`opacity-0 group-hover:opacity-100 transition-opacity ${isGenocide ? 'text-ut-red fill-ut-red' : ''}`} />
+            <span className="font-8bit text-sm">BACK</span>
+          </button>
         </div>
       </div>
     );
@@ -99,9 +160,9 @@ export const FightView: React.FC<FightViewProps> = ({ route }) => {
         {isGenocide ? "* IN MY WAY." : "* You encounter various projects!"}
       </div>
       <ul className="space-y-4 overflow-y-auto custom-scrollbar pr-2">
-        {PROJECTS.map((p) => (
-          <li 
-            key={p.id} 
+        {projects.map((p) => (
+          <li
+            key={p.id}
             className="group cursor-pointer flex items-center gap-3 pl-2 hover:bg-gray-900 py-2 transition-colors"
             onClick={() => handleProjectClick(p)}
             onMouseEnter={() => playMenuMove()}
@@ -116,12 +177,12 @@ export const FightView: React.FC<FightViewProps> = ({ route }) => {
               {/* HP Bar simulation for the project */}
               <div className="hidden md:block w-24 h-4 bg-red-900 border border-gray-600 relative">
                 {isGenocide ? (
-                   <div className="h-full bg-gray-600 absolute top-0 left-0 w-0"></div>
+                  <div className="h-full bg-gray-600 absolute top-0 left-0 w-0"></div>
                 ) : (
-                   <div 
-                    className="h-full bg-green-500 absolute top-0 left-0" 
+                  <div
+                    className="h-full bg-green-500 absolute top-0 left-0"
                     style={{ width: `${Math.random() * 40 + 60}%` }}
-                   ></div>
+                  ></div>
                 )}
               </div>
             </div>

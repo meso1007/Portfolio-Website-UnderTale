@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -26,8 +25,23 @@ type NewEntryRequest struct {
 	Date    string `json:"date,omitempty"`
 }
 
+type Project struct {
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Tech        []string `json:"tech"`
+	Stats       struct {
+		Atk int `json:"atk"`
+		Def int `json:"def"`
+	} `json:"stats"`
+	Link  string `json:"link"`
+	Image string `json:"image"`
+}
+
 var notionClient *notionapi.Client
 var databaseID notionapi.DatabaseID
+var projectsClient *notionapi.Client
+var projectsDBID notionapi.DatabaseID
 
 func init() {
 	// Load environment variables
@@ -35,28 +49,115 @@ func init() {
 		log.Println("Warning: .env file not found, using environment variables")
 	}
 
+	// Guestbook Config
 	token := os.Getenv("NOTION_TOKEN")
 	dbID := os.Getenv("NOTION_DATABASE_ID")
 
 	if token == "" || dbID == "" {
-		log.Fatal("NOTION_TOKEN and NOTION_DATABASE_ID must be set in environment variables")
+		log.Fatal("NOTION_TOKEN and NOTION_DATABASE_ID must be set")
 	}
 
 	notionClient = notionapi.NewClient(notionapi.Token(token))
 	databaseID = notionapi.DatabaseID(dbID)
-	log.Println("Notion client initialized successfully")
+	log.Println("Guestbook Notion client initialized")
 
-	// Check database and print properties
-	db, err := notionClient.Database.Get(context.Background(), databaseID)
-	if err != nil {
-		log.Printf("Error retrieving database: %v", err)
+	// Projects Config
+	projectsToken := os.Getenv("NOTION_PROJECTS_TOKEN")
+	projectsDB := os.Getenv("NOTION_PROJECTS_DB_ID")
+
+	if projectsToken != "" && projectsDB != "" {
+		projectsClient = notionapi.NewClient(notionapi.Token(projectsToken))
+		projectsDBID = notionapi.DatabaseID(projectsDB)
+		log.Println("Projects Notion client initialized")
 	} else {
-		keys := make([]string, 0, len(db.Properties))
-		for k, v := range db.Properties {
-			keys = append(keys, k+"("+string(v.GetType())+")")
-		}
-		log.Printf("Database connected. Available properties: %v", keys)
+		log.Println("Warning: Projects Notion credentials missing")
 	}
+}
+
+func getProjectsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if projectsClient == nil {
+		http.Error(w, "Projects API not configured", http.StatusServiceUnavailable)
+		return
+	}
+
+	query := &notionapi.DatabaseQueryRequest{
+		Sorts: []notionapi.SortObject{
+			{
+				Property:  "Name",
+				Direction: notionapi.SortOrderASC,
+			},
+		},
+	}
+
+	resp, err := projectsClient.Database.Query(r.Context(), projectsDBID, query)
+	if err != nil {
+		log.Printf("Error querying Projects database: %v", err)
+		http.Error(w, "Failed to fetch projects", http.StatusInternalServerError)
+		return
+	}
+
+	var projects []Project
+	for _, page := range resp.Results {
+		project := Project{
+			ID: page.ID.String(),
+		}
+
+		// Name (Title)
+		if prop, ok := page.Properties["Name"].(*notionapi.TitleProperty); ok && len(prop.Title) > 0 {
+			project.Name = prop.Title[0].PlainText
+		}
+
+		// Description (RichText)
+		if prop, ok := page.Properties["Description"].(*notionapi.RichTextProperty); ok && len(prop.RichText) > 0 {
+			project.Description = prop.RichText[0].PlainText
+		}
+
+		// Tech (MultiSelect)
+		if prop, ok := page.Properties["Tech"].(*notionapi.MultiSelectProperty); ok {
+			for _, opt := range prop.MultiSelect {
+				project.Tech = append(project.Tech, opt.Name)
+			}
+		}
+
+		// Stats (Number)
+		if prop, ok := page.Properties["ATK"].(*notionapi.NumberProperty); ok {
+			project.Stats.Atk = int(prop.Number)
+		}
+		if prop, ok := page.Properties["DEF"].(*notionapi.NumberProperty); ok {
+			project.Stats.Def = int(prop.Number)
+		}
+
+		// Link (URL)
+		if prop, ok := page.Properties["Link"].(*notionapi.URLProperty); ok {
+			project.Link = prop.URL
+		}
+
+		// Image (URL or Files)
+		if prop, ok := page.Properties["Image"].(*notionapi.URLProperty); ok {
+			project.Image = prop.URL
+		} else if prop, ok := page.Properties["Image"].(*notionapi.FilesProperty); ok && len(prop.Files) > 0 {
+			if prop.Files[0].Type == "external" {
+				project.Image = prop.Files[0].External.URL
+			} else if prop.Files[0].Type == "file" {
+				project.Image = prop.Files[0].File.URL
+			}
+		}
+
+		projects = append(projects, project)
+	}
+
+	if projects == nil {
+		projects = []Project{}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(projects)
+	log.Printf("Returned %d projects from Notion", len(projects))
 }
 
 func getEntriesHandler(w http.ResponseWriter, r *http.Request) {
@@ -214,9 +315,17 @@ func main() {
 		}
 	})
 
+	mux.HandleFunc("/api/projects", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			getProjectsHandler(w, r)
+		} else {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
+
 	// CORS configuration for frontend
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000", "http://localhost:3001", "http://localhost:3002"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,

@@ -103,3 +103,8 @@ export const PLAYER_TRAITS = [
   "* Diving into the world of OSS.",
   "* Seeking inspiration in foreign lands."
 ];
+
+// Intro Screen Text
+export const INTRO_TITLE = `LONG AGO, IN ${new Date().getFullYear()}...`;
+export const INTRO_SUBTITLE = "The story of SHOYA HORIUCHI";
+export const INTRO_START_TEXT = "[ CLICK TO START ]";

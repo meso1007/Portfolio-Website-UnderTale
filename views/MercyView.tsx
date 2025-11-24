@@ -42,7 +42,7 @@ export const MercyView: React.FC<MercyViewProps> = ({ route, onPacifistTrigger }
 
   if (spared) {
     return (
-      <div className="h-full flex flex-col items-center justify-center text-center">
+      <div className="h-full flex flex-col items-center justify-center text-center pt-10">
         <div className="mb-6 animate-bounce">
           <SoulHeart className="w-16 h-16 text-yellow-400 fill-yellow-400" />
         </div>

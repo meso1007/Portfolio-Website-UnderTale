@@ -1,8 +1,8 @@
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ViewState, GameRoute } from './types';
-import { PLAYER_NAME, PLAYER_LV, PLAYER_ROLE, PLAYER_LOCATION, PLAYER_TRAITS } from './constants';
+import { PLAYER_NAME, PLAYER_LV, PLAYER_ROLE, PLAYER_LOCATION, PLAYER_TRAITS, INTRO_TITLE, INTRO_SUBTITLE, INTRO_START_TEXT } from './constants';
 import { BattleButton } from './components/BattleButton';
 import { DialogueBox } from './components/DialogueBox';
 import { FightView } from './views/FightView';
@@ -31,17 +31,89 @@ const WEB_DEV_PAINS = [
 ];
 
 const App: React.FC = () => {
-  const [hasStarted, setHasStarted] = useState(false);
+  const [visitCount, setVisitCount] = useState<number>(0);
+  const [city, setCity] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>(''); // Initial avatar URL
+  const [hasStarted, setHasStarted] = useState<boolean>(false);
   const [view, setView] = useState<ViewState>(ViewState.INTRO);
-  const [showControls, setShowControls] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState("./assets/pixel-user.png");
-  const [currentHpValue, setCurrentHpValue] = useState(MAX_HP);
-  const [isAttacked, setIsAttacked] = useState(false);
-  const [damageMsg, setDamageMsg] = useState("");
+  const [showControls, setShowControls] = useState<boolean>(false);
+  const [isAttacked, setIsAttacked] = useState<boolean>(false);
+  const [damageMsg, setDamageMsg] = useState<string>('');
+  const [currentHpValue, setCurrentHpValue] = useState<number>(MAX_HP);
+  const [showSpeechBubble, setShowSpeechBubble] = useState<boolean>(true);
+
+  // Ref to prevent double-counting in React Strict Mode
+  const hasIncrementedRef = useRef(false);
+
+  // Load visit count and city from localStorage, and fetch city if not found
+  useEffect(() => {
+    // Visit Count Logic - increment only once (prevent double-counting in Strict Mode)
+    if (!hasIncrementedRef.current) {
+      const storedVisitCount = localStorage.getItem('visit_count');
+      const count = storedVisitCount ? parseInt(storedVisitCount, 10) : 0;
+      const newCount = count + 1;
+      setVisitCount(newCount);
+      localStorage.setItem('visit_count', newCount.toString());
+      hasIncrementedRef.current = true;
+    } else {
+      // Just load the count without incrementing
+      const storedVisitCount = localStorage.getItem('visit_count');
+      const count = storedVisitCount ? parseInt(storedVisitCount, 10) : 1;
+      setVisitCount(count);
+    }
+
+    // City Logic
+    const storedCity = localStorage.getItem('user_city');
+    if (storedCity) {
+      setCity(storedCity);
+    } else {
+      fetch('https://ipapi.co/json/')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.city) {
+            setCity(data.city);
+            localStorage.setItem('user_city', data.city);
+          }
+        })
+        .catch(err => console.error('Failed to fetch city:', err));
+    }
+
+    // Set initial avatar URL
+    setAvatarUrl(`https://api.dicebear.com/9.x/pixel-art/svg?seed=${PLAYER_NAME}`);
+  }, []);
+
+  // Auto-hide speech bubble after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSpeechBubble(false);
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const getVisitMessage = (count: number) => {
+    if (count === 1) return 'Greetings. I see you have fallen into my code.';
+    if (count === 2) return 'You came back. I knew you would.';
+    if (count === 3) return 'Third time. Looking for secrets?';
+    if (count === 4) return 'Four times. Don\'t you have work to do?';
+    if (count === 5) return 'Five times? You really like checking my stats.';
+    if (count < 10) return `Visit #${count}. You are filled with DETERMINATION.`;
+    if (count < 20) return `${count} times... I guess we're friends now.`;
+    if (count < 50) return 'You know this portfolio better than I do.';
+    return '...You really have nothing better to do, do you?';
+  };
+
+  // Avatar source - always use user's image
+  const avatarSrc = 'assets/pixel-user.png';
+
+  // Speech bubble for visit count
+  const renderSpeechBubble = (
+    <div className="absolute -top-24 left-1/2 -translate-x-1/2 bg-black border border-white px-3 py-1 rounded-md text-xs whitespace-nowrap">
+      {getVisitMessage(visitCount)}
+    </div>
+  );
 
   // Route State
   const [gameRoute, setGameRoute] = useState<GameRoute>(GameRoute.NEUTRAL);
-
   const isGenocide = gameRoute === GameRoute.GENOCIDE;
   const isPacifist = gameRoute === GameRoute.PACIFIST;
 
@@ -121,10 +193,10 @@ const App: React.FC = () => {
       case ViewState.INTRO:
         return (
           <div className={`flex flex-col h-full justify-center transition-all duration-100 ${isAttacked ? 'animate-shake' : ''}`}>
-            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 mb-6">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 mb-6 overflow-visible">
               {/* Avatar Column */}
-              <div className="flex flex-col items-center gap-6 shrink-0 mx-auto md:mx-0">
-                <div className="relative group">
+              <div className="flex flex-col items-center gap-6 shrink-0 mx-auto md:mx-0 overflow-visible">
+                <div className="relative group overflow-visible">
                   <div
                     className={`w-40 h-40 md:w-52 md:h-52 relative border-4 ${isGenocide ? 'border-ut-red' : 'border-white'} bg-black p-2 transition-all duration-75`}
                     style={{
@@ -139,7 +211,7 @@ const App: React.FC = () => {
                       </div>
                     ) : (
                       <img
-                        src={avatarUrl}
+                        src={avatarSrc}
                         onError={handleImageError}
                         alt="Player Avatar"
                         className={`w-full h-full object-contain ${!isAttacked ? 'animate-float' : ''}`}
@@ -150,9 +222,26 @@ const App: React.FC = () => {
                       />
                     )}
                   </div>
+
+                  {/* Speech Bubble - Undertale Style (Absolute positioned) */}
+                  {!isGenocide && showSpeechBubble && (
+                    <div className={`absolute left-full ml-4 top-0 hidden md:block z-20 pointer-events-none transition-opacity duration-500 ${showSpeechBubble ? 'opacity-100' : 'opacity-0'}`}>
+                      <div className="bg-black border-2 border-white px-4 py-2 rounded-lg min-w-[200px] shadow-lg">
+                        <span className="font-pixel text-white text-sm">
+                          * {getVisitMessage(visitCount)}
+                        </span>
+                      </div>
+                      {/* Triangle pointer (pointing left) */}
+                      <div className="absolute left-0 top-4 -translate-x-2">
+                        <div className="w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-white border-b-[8px] border-b-transparent"></div>
+                        <div className="absolute left-[2px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-r-[6px] border-r-black border-b-[6px] border-b-transparent"></div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Name Tag */}
                   <div className={`absolute -bottom-4 left-1/2 -translate-x-1/2 bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-3 py-1 whitespace-nowrap z-10`}>
-                    <span className={`font-8bit text-xs ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
+                    <span className={`font-8bit mb-4 text-xs ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
                       {isGenocide ? 'ENEMY' : PLAYER_ROLE}
                     </span>
                   </div>
@@ -183,7 +272,7 @@ const App: React.FC = () => {
                   </h1>
                   <div className={`flex justify-between font-pixel ${isGenocide ? 'text-ut-red' : 'text-gray-400'} text-sm md:text-base`}>
                     <span>{isGenocide ? 'LV 99' : `LV ${PLAYER_LV}`}</span>
-                    <span>{isGenocide ? 'LOC: VOID' : `LOC: ${PLAYER_LOCATION}`}</span>
+                    <span>{isGenocide ? 'LOC: VOID' : `LOC: ${city || PLAYER_LOCATION}`}</span>
                   </div>
                 </div>
 
@@ -255,7 +344,7 @@ const App: React.FC = () => {
       >
         <div className="text-center space-y-6">
           <p className="font-8bit text-gray-500 text-xs tracking-widest mb-4">
-            LONG AGO, IN 2025...
+            {INTRO_TITLE}
           </p>
 
           <h1 className="font-8bit text-xl md:text-5xl text-ut-yellow tracking-wider animate-pulse">
@@ -263,13 +352,13 @@ const App: React.FC = () => {
           </h1>
 
           <p className="font-8bit text-sm text-white mt-4">
-            The story of Shoya Horiuchi.
+            {INTRO_SUBTITLE}
           </p>
 
           <div className="mt-16 animate-bounce">
             <p className="font-8bit text-xs text-gray-400">
               <span className="text-red-500 mr-2 text-base">❤</span>
-              [ PRESS Z OR CLICK TO START ]
+              {INTRO_START_TEXT}
             </p>
           </div>
         </div>

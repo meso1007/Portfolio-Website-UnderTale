@@ -116,7 +116,7 @@ export const SavePoint: React.FC = () => {
     <>
       {/* The Yellow Star */}
       <button
-        className="fixed bottom-8 right-8 text-ut-yellow animate-pulse hover:scale-110 transition-transform z-40 group"
+        className="fixed bottom-4 right-8 text-ut-yellow animate-pulse hover:scale-110 transition-transform z-40 group"
         onClick={handleOpen}
         onMouseEnter={() => playMenuMove()}
       >

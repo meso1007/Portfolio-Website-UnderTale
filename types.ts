@@ -29,7 +29,7 @@ export interface Skill {
   name: string;
   level: number; // 1-20
   description: string;
-  type: 'FRONT' | 'BACK' | 'TOOL';
+  type: 'FRONT' | 'BACK' | 'TOOL' | 'ITEM';
 }
 
 export interface Experience {
@@ -40,7 +40,7 @@ export interface Experience {
 }
 
 export interface GuestbookEntry {
-  id: number;
+  id: string;
   name: string;
   message: string;
   date: string;

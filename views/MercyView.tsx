@@ -1,6 +1,7 @@
 
 
 import React, { useState } from 'react';
+import { Mail, Github, Linkedin, Instagram } from 'lucide-react';
 import { SoulHeart } from '../components/SoulHeart';
 import { Typewriter } from '../components/Typewriter';
 import { playConfirm, playMenuMove, playHeal } from '../utils/sound';
@@ -16,49 +17,52 @@ export const MercyView: React.FC<MercyViewProps> = ({ route, onPacifistTrigger }
   const isGenocide = route === GameRoute.GENOCIDE;
 
   const handleSpare = () => {
-    if (isGenocide) return; // Cannot spare in genocide
-    playHeal(); // Pacifist sound
+    if (isGenocide) return;
+    playHeal();
     setSpared(true);
     onPacifistTrigger();
   };
 
   if (isGenocide) {
-     return (
+    return (
       <div className="h-full flex flex-col items-center justify-center text-center">
         <div className="animate-glitch text-ut-red font-pixel text-3xl mb-8">
           * BUT NOBODY CAME.
         </div>
-        {/* Still allow contact in Genocide, but it's scary */}
-        <a 
-          href="mailto:hello@example.com" 
+        <a
+          href="mailto:hello@example.com"
           className="font-8bit text-gray-600 hover:text-ut-red text-xs transition-colors"
           onMouseEnter={() => playMenuMove()}
         >
           (send hate mail)
         </a>
       </div>
-     );
+    );
   }
 
   if (spared) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center">
-        <div className="mb-6 animate-float">
-           <SoulHeart className="w-16 h-16 text-blue-300 fill-blue-300" />
+        <div className="mb-6 animate-bounce">
+          <SoulHeart className="w-16 h-16 text-yellow-400 fill-yellow-400" />
         </div>
-        <Typewriter 
-          text="* YOU WON! The developer is now your friend." 
-          className="text-blue-300 text-center mb-4 block"
+
+        <Typewriter
+          text="* YOU WON! The developer is now your friend."
+          className="text-yellow-400 text-center mb-4 block text-xl"
         />
-        <p className="font-pixel text-white">
+
+        <p className="font-pixel text-gray-300 mb-8 text-sm">
           (They look ready to join your party / company.)
         </p>
-        <a 
-          href="mailto:hello@example.com" 
-          className="mt-8 font-8bit border-2 border-white px-4 py-2 bg-white text-black hover:bg-blue-100 transition-colors animate-pulse"
+
+        <a
+          href="mailto:diegoshoya2017@gmail.com"
+          className="font-8bit border-4 border-yellow-400 px-6 py-3 bg-black text-yellow-400 hover:bg-yellow-400 hover:text-black transition-colors animate-pulse"
           onMouseEnter={() => playMenuMove()}
+          onClick={() => playHeal()}
         >
-          HIRE NOW!
+          SEND OFFER LETTER
         </a>
       </div>
     );
@@ -72,61 +76,76 @@ export const MercyView: React.FC<MercyViewProps> = ({ route, onPacifistTrigger }
 
       <div className="flex flex-col gap-4 mt-8 overflow-y-auto custom-scrollbar">
         <div className="font-pixel text-gray-400 mb-2">* What will you do?</div>
-        
-        <a 
-          href="mailto:hello@example.com" 
+
+        <a
+          href="mailto:diegoshoya2017@gmail.com"
           className="group flex items-center gap-4 text-xl cursor-pointer"
           onMouseEnter={() => playMenuMove()}
         >
-           <div className="w-6 opacity-0 group-hover:opacity-100">
-             <SoulHeart />
-           </div>
-           <span className="font-8bit text-white group-hover:text-ut-yellow">
-             ✉ EMAIL
-           </span>
+          <div className="w-6 opacity-0 group-hover:opacity-100">
+            <SoulHeart />
+          </div>
+          <span className="font-8bit text-white group-hover:text-ut-yellow flex items-center gap-2">
+            <Mail size={16} /> EMAIL
+          </span>
         </a>
 
-        <a 
-          href="https://github.com" 
-          target="_blank" 
-          rel="noreferrer" 
+        <a
+          href="https://github.com/meso1007"
+          target="_blank"
+          rel="noreferrer"
           className="group flex items-center gap-4 text-xl cursor-pointer"
           onMouseEnter={() => playMenuMove()}
         >
-           <div className="w-6 opacity-0 group-hover:opacity-100">
-             <SoulHeart />
-           </div>
-           <span className="font-8bit text-white group-hover:text-ut-yellow">
-             GITHUB
-           </span>
+          <div className="w-6 opacity-0 group-hover:opacity-100">
+            <SoulHeart />
+          </div>
+          <span className="font-8bit text-white group-hover:text-ut-yellow flex items-center gap-2">
+            <Github size={16} /> GITHUB
+          </span>
         </a>
 
-        <a 
-          href="https://linkedin.com" 
-          target="_blank" 
-          rel="noreferrer" 
+        <a
+          href="https://www.linkedin.com/in/shoya-horiuchi-83b785278/"
+          target="_blank"
+          rel="noreferrer"
           className="group flex items-center gap-4 text-xl cursor-pointer"
           onMouseEnter={() => playMenuMove()}
         >
-           <div className="w-6 opacity-0 group-hover:opacity-100">
-             <SoulHeart />
-           </div>
-           <span className="font-8bit text-white group-hover:text-ut-yellow">
-             LINKEDIN
-           </span>
+          <div className="w-6 opacity-0 group-hover:opacity-100">
+            <SoulHeart />
+          </div>
+          <span className="font-8bit text-white group-hover:text-ut-yellow flex items-center gap-2">
+            <Linkedin size={16} /> LINKEDIN
+          </span>
         </a>
 
-        <button 
-          onClick={handleSpare} 
+        <a
+          href="https://www.instagram.com/sh02__nmi/"
+          target="_blank"
+          rel="noreferrer"
+          className="group flex items-center gap-4 text-xl cursor-pointer"
+          onMouseEnter={() => playMenuMove()}
+        >
+          <div className="w-6 opacity-0 group-hover:opacity-100">
+            <SoulHeart />
+          </div>
+          <span className="font-8bit text-white group-hover:text-ut-yellow flex items-center gap-2">
+            <Instagram size={16} /> INSTAGRAM
+          </span>
+        </a>
+
+        <button
+          onClick={handleSpare}
           className="group flex items-center gap-4 text-xl cursor-pointer mt-8 text-ut-yellow"
           onMouseEnter={() => playMenuMove()}
         >
-           <div className="w-6 opacity-0 group-hover:opacity-100">
-             <SoulHeart />
-           </div>
-           <span className="font-8bit">
-             ♥ SPARE
-           </span>
+          <div className="w-6 opacity-0 group-hover:opacity-100">
+            <SoulHeart />
+          </div>
+          <span className="font-8bit">
+            ♥ SPARE
+          </span>
         </button>
       </div>
     </div>

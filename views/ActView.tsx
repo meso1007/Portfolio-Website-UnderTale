@@ -13,13 +13,13 @@ export const ActView: React.FC<ActViewProps> = ({ route }) => {
   return (
     <div className="h-full flex flex-col">
       <div className="mb-2">
-        <Typewriter 
-          text={isGenocide ? "* EXECUTION POINTS (EXP) list." : "* You checked your STATS."} 
-          speed={20} 
+        <Typewriter
+          text={isGenocide ? "* EXECUTION POINTS (EXP) list." : "* You checked your STATS."}
+          speed={20}
           className={isGenocide ? 'text-ut-red' : ''}
         />
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mt-4 overflow-y-auto custom-scrollbar pr-2">
         {SKILLS.map((skill) => (
           <div key={skill.name} className="mb-2">
@@ -30,9 +30,9 @@ export const ActView: React.FC<ActViewProps> = ({ route }) => {
               </span>
             </div>
             <div className="w-full h-3 bg-red-900 border border-white/30 relative">
-              <div 
+              <div
                 className={`h-full absolute top-0 left-0 ${isGenocide ? 'bg-white animate-pulse' : 'bg-ut-yellow'}`}
-                style={{ width: `${(skill.level / 20) * 100}%` }}
+                style={{ width: `${(skill.level / 100) * 100}%` }}
               ></div>
             </div>
             <p className={`font-pixel text-sm mt-1 ${isGenocide ? 'text-ut-red opacity-70' : 'text-gray-300'}`}>

@@ -1,0 +1,21 @@
+# Render Blueprint for UNDERTALE Portfolio Backend
+
+services:
+  # Go Backend API
+  - type: web
+    name: undertale-portfolio-api
+    env: go
+    region: oregon
+    plan: free
+    buildCommand: cd backend && go build -o main .
+    startCommand: cd backend && ./main
+    envVars:
+      - key: NOTION_API_KEY
+        sync: false
+      - key: NOTION_DATABASE_ID
+        sync: false
+      - key: NOTION_PROJECTS_DATABASE_ID
+        sync: false
+      - key: PORT
+        value: 8080
+    healthCheckPath: /health

@@ -9,6 +9,7 @@ import { FightView } from './views/FightView';
 import { ActView } from './views/ActView';
 import { ItemView } from './views/ItemView';
 import { MercyView } from './views/MercyView';
+import { SecretView } from './views/SecretView';
 import { Typewriter } from './components/Typewriter';
 import { playCancel, playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch } from './utils/sound';
 import { SoulHeart } from './components/SoulHeart';
@@ -41,6 +42,10 @@ const App: React.FC = () => {
   const [damageMsg, setDamageMsg] = useState<string>('');
   const [currentHpValue, setCurrentHpValue] = useState<number>(MAX_HP);
   const [showSpeechBubble, setShowSpeechBubble] = useState<boolean>(true);
+
+  // Secret route sequence tracking
+  const [buttonSequence, setButtonSequence] = useState<ViewState[]>([]);
+  const [secretUnlocked, setSecretUnlocked] = useState<boolean>(false);
 
   // Ref to prevent double-counting in React Strict Mode
   const hasIncrementedRef = useRef(false);
@@ -188,6 +193,38 @@ const App: React.FC = () => {
     setGameRoute(GameRoute.PACIFIST);
   };
 
+  // Handle view change with sequence tracking
+  const handleViewChange = (newView: ViewState) => {
+    // Don't track if already unlocked or if it's the secret view
+    if (secretUnlocked || newView === ViewState.SECRET) {
+      setView(newView);
+      return;
+    }
+
+    // Add to sequence
+    const newSequence = [...buttonSequence, newView];
+    setButtonSequence(newSequence);
+
+    // Check if the correct sequence is completed: ACT → ITEM → MERCY → FIGHT
+    const correctSequence = [ViewState.ACT, ViewState.ITEM, ViewState.MERCY, ViewState.FIGHT];
+    const lastFour = newSequence.slice(-4);
+
+    if (lastFour.length === 4 &&
+      lastFour[0] === correctSequence[0] &&
+      lastFour[1] === correctSequence[1] &&
+      lastFour[2] === correctSequence[2] &&
+      lastFour[3] === correctSequence[3]) {
+      // Secret unlocked!
+      setSecretUnlocked(true);
+      setView(ViewState.SECRET);
+      playGlitch(); // Play special sound
+      return;
+    }
+
+    // Normal view change
+    setView(newView);
+  };
+
   const renderContent = () => {
     switch (view) {
       case ViewState.INTRO:
@@ -331,6 +368,8 @@ const App: React.FC = () => {
         return <ItemView />;
       case ViewState.MERCY:
         return <MercyView route={gameRoute} onPacifistTrigger={handlePacifistTrigger} />;
+      case ViewState.SECRET:
+        return <SecretView route={gameRoute} />;
       default:
         return null;
     }
@@ -429,28 +468,28 @@ const App: React.FC = () => {
             label={isGenocide ? "VICTIMS" : "PROJECTS"}
             iconColor="text-ut-red"
             isActive={view === ViewState.FIGHT}
-            onClick={() => setView(ViewState.FIGHT)}
+            onClick={() => handleViewChange(ViewState.FIGHT)}
             colorClass="text-ut-red"
           />
           <BattleButton
             label={isGenocide ? "EXP" : "SKILLS"}
             iconColor="text-blue-400"
             isActive={view === ViewState.ACT}
-            onClick={() => setView(ViewState.ACT)}
+            onClick={() => handleViewChange(ViewState.ACT)}
             colorClass="text-blue-400"
           />
           <BattleButton
             label={isGenocide ? "LV" : "HISTORY"}
             iconColor="text-orange-400"
             isActive={view === ViewState.ITEM}
-            onClick={() => setView(ViewState.ITEM)}
+            onClick={() => handleViewChange(ViewState.ITEM)}
             colorClass="text-orange-400"
           />
           <BattleButton
             label={isGenocide ? "NOBODY" : "CONTACT"}
             iconColor="text-ut-yellow"
             isActive={view === ViewState.MERCY}
-            onClick={() => setView(ViewState.MERCY)}
+            onClick={() => handleViewChange(ViewState.MERCY)}
             colorClass="text-ut-yellow"
           />
         </div>

@@ -323,9 +323,15 @@ func main() {
 		}
 	})
 
+	// Health check endpoint for Render
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
 	// CORS configuration for frontend
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000", "http://localhost:3001", "http://localhost:3002"},
+		AllowedOrigins:   []string{"http://localhost:5173", "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "https://your-frontend-domain.com"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},
 		AllowCredentials: true,
@@ -333,6 +339,12 @@ func main() {
 
 	handler := corsHandler.Handler(mux)
 
-	log.Println("Starting server on :8080 with Notion API...")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	// Get PORT from environment variable (Render sets this)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default for local development
+	}
+
+	log.Printf("Starting server on port %s with Notion API...\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }

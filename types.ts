@@ -4,6 +4,7 @@ export enum ViewState {
   ACT = 'ACT',     // Skills
   ITEM = 'ITEM',   // Experience/Resume
   MERCY = 'MERCY', // Contact
+  SECRET = 'SECRET', // Hidden Route
 }
 
 export enum GameRoute {

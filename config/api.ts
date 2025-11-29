@@ -1,8 +1,5 @@
 // API Configuration
-export const API_BASE_URL = import.meta.env.MODE === 'production'
-    ? 'https://undertale-api.fly.dev/api/save'
-    : 'http://localhost:8080';
-
+export const API_BASE_URL = 'https://undertale-api.fly.dev';
 // API Endpoints
 export const API_ENDPOINTS = {
     GUESTBOOK: `${API_BASE_URL}/api/guestbook`,

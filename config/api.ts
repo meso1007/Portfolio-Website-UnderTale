@@ -1,6 +1,6 @@
 // API Configuration
 export const API_BASE_URL = import.meta.env.MODE === 'production'
-    ? 'https://undertale-api.onrender.com'
+    ? 'https://undertale-api.fly.dev/api/save'
     : 'http://localhost:8080';
 
 // API Endpoints

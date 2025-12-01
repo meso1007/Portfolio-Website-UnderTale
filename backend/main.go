@@ -332,11 +332,11 @@ func main() {
 	// CORS configuration for frontend
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins: []string{
-			"http://localhost:5173",
 			"http://localhost:3000",
-			"http://localhost:3001",
-			"http://localhost:3002",
-			"https://portfolio-website-under-tail.vercel.app", // Add your specific Vercel URL
+			"http://localhost:5173",
+			"https://portfolio-website-under-tail.vercel.app",
+			"https://shoyahoriuchi.me",
+			"https://www.shoyahoriuchi.me",
 		},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type"},

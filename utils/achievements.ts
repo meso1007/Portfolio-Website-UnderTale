@@ -58,7 +58,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: 'reset-repeat',
     title: 'HOW MANY TIMES?',
     description: 'Reset the timeline three times.',
-    hint: 'TRUE RESET is a choice.',
+    hint: 'Defeat the developer, then press RESET (top left) three times.',
   },
   {
     id: 'true-secret',

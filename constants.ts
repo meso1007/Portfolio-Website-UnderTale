@@ -92,7 +92,7 @@ export const SKILLS: Skill[] = [
   {
     name: 'ENGLISH',
     level: 88,
-    description: 'Professional working proficiency. Studied and worked in Canada.',
+    description: 'Professional working proficiency. Studied in Canada.',
     type: 'TOOL'
   },
   {

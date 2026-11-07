@@ -93,24 +93,6 @@ export const SKILLS: Skill[] = [
     type: 'TOOL'
   },
   {
-    name: 'ORACLE',
-    level: 70,
-    description: 'An ancient tome of data. Heavy, but reliable.',
-    type: 'TOOL'
-  },
-  {
-    name: 'REDIS',
-    level: 76,
-    description: 'Casts Haste. Everything resolves in a blink.',
-    type: 'TOOL'
-  },
-  {
-    name: 'GIT',
-    level: 72,
-    description: 'Time travel capability (Save/Load).',
-    type: 'TOOL'
-  },
-  {
     name: 'COFFEE',
     level: 99,
     description: 'Restores HP. Essential for survival.',
@@ -123,12 +105,6 @@ export const HISTORY: Experience[] = [
     company: 'IN-HOUSE WEB SERVICE',
     year: '2026 APR',
     description: 'Ships features end to end: Java / Spring Boot APIs, Vue.js UI, Kubernetes and CI/CD.',
-  },
-  {
-    role: 'OSS DEVELOPER',
-    company: 'GITHUB',
-    year: '2025 OCT',
-    description: 'Released Tagoly, a Go CLI that keeps Git history consistent.',
   },
   {
     role: 'STARTUP DEV INTERN',

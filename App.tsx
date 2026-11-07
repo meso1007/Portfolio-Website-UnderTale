@@ -18,6 +18,7 @@ import { SoulHeart } from './components/SoulHeart';
 import { SavePoint } from './components/SavePoint';
 import { BgmTrack, isBgmMuted, startBgm, setBgmTrack, toggleBgmMuted } from './utils/bgm';
 import { isTyping, skipTyping } from './utils/typing';
+import { unlockAchievement } from './utils/achievements';
 
 const MAX_HP = 101;
 const DAMAGE_PER_HIT = 25;
@@ -191,6 +192,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!hasStarted) return;
     if (gameRoute === GameRoute.GENOCIDE) {
+      unlockAchievement('genocide');
       setRouteFlash(true);
       const flashTimer = window.setTimeout(() => setRouteFlash(false), 600);
       return () => window.clearTimeout(flashTimer);
@@ -327,6 +329,9 @@ const App: React.FC = () => {
     }
     const lineIndex = Math.min(nextResetCount - 1, RESET_LINES.length - 1);
     showAvatarLine(RESET_LINES[Math.max(0, lineIndex)], nextResetCount >= 2, 4500);
+    if (nextResetCount >= 3) {
+      unlockAchievement('reset-repeat');
+    }
 
     setEnding(null);
     setGameRoute(GameRoute.NEUTRAL);
@@ -341,6 +346,7 @@ const App: React.FC = () => {
   };
 
   const handlePacifistTrigger = () => {
+    unlockAchievement('pacifist');
     setGameRoute(GameRoute.PACIFIST);
     setEnding('PACIFIST');
   };
@@ -385,6 +391,7 @@ const App: React.FC = () => {
         return;
       }
       // Secret unlocked!
+      unlockAchievement('secret-route');
       setSecretUnlocked(true);
       transitionTo(ViewState.SECRET, true);
       return;

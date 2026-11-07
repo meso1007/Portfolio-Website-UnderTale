@@ -4,6 +4,7 @@ import { playSave, playMenuMove, playConfirm, playSelect } from '../utils/sound'
 import { Typewriter } from './Typewriter';
 import { GuestbookEntry } from '../types';
 import { API_ENDPOINTS } from '../config/api';
+import { unlockAchievement } from '../utils/achievements';
 
 // API Configuration
 const API_URL = API_ENDPOINTS.GUESTBOOK;
@@ -96,6 +97,7 @@ export const SavePoint: React.FC = () => {
       localStorage.setItem('undertale_guestbook', JSON.stringify(newEntries));
     }
 
+    unlockAchievement('guestbook');
     setName("");
     setMessage("");
     setView('MENU'); // Return to save confirmation screen

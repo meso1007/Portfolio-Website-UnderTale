@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     MessageSquare, BarChart3, Code2, Sparkles, Trophy,
     Github, ArrowLeft, CheckCircle2, Circle, Terminal,
-    Lock, Unlock, Music, PlayCircle
+    Lock, Unlock, Music, PlayCircle, Award
 } from 'lucide-react';
 import { Typewriter } from '../components/Typewriter';
 import { playConfirm, playGlitch, playHeal, playMenuMove } from '../utils/sound';
 import { BgmTrack, setBgmTrack } from '../utils/bgm';
+import { ACHIEVEMENTS, getUnlockedAchievements, onAchievementsChanged, unlockAchievement } from '../utils/achievements';
 import { GameRoute } from '../types';
 
 interface SecretViewProps {
@@ -77,6 +78,7 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     const [playing, setPlaying] = useState<BgmTrack>('SECRET');
     const [history, setHistory] = useState<string[]>(TERMINAL_INTRO);
     const [command, setCommand] = useState('');
+    const [unlocked, setUnlocked] = useState<string[]>(getUnlockedAchievements());
     const terminalRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -86,9 +88,19 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     }, [history]);
 
     useEffect(() => {
+        const sync = () => setUnlocked(getUnlockedAchievements());
+        const unsubscribe = onAchievementsChanged(sync);
+        unlockAchievement('secret-route');
+        unlockAchievement('secret-bgm');
+        sync();
+        return unsubscribe;
+    }, []);
+
+    useEffect(() => {
         if (usedTerminal && usedJukebox && decrypted && !trueSecretShown) {
             setTrueSecretShown(true);
             playHeal();
+            unlockAchievement('true-secret');
         }
     }, [usedTerminal, usedJukebox, decrypted, trueSecretShown]);
 
@@ -110,12 +122,14 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
         setBgmTrack(track);
         setPlaying(track);
         setUsedJukebox(true);
+        unlockAchievement('jukebox');
     };
 
     const handleDecrypt = () => {
         if (decrypted) return;
         playGlitch();
         setDecrypted(true);
+        unlockAchievement('decrypted');
     };
 
     const runCommand = (raw: string) => {
@@ -173,6 +187,7 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
         setHistory((prev) => [...prev, ...output]);
         setCommand('');
         setUsedTerminal(true);
+        unlockAchievement('terminal');
     };
 
     const objectives = [
@@ -385,6 +400,39 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                             </span>
                         </li>
                     ))}
+                </ul>
+            </Panel>
+
+            {/* Hidden archive */}
+            <Panel icon={<Award size={18} />} title="HIDDEN ARCHIVE">
+                <div className="flex justify-between items-baseline font-pixel text-xs text-gray-400 mb-3">
+                    <span>COLLECTION</span>
+                    <span className="text-ut-yellow">{unlocked.length} / {ACHIEVEMENTS.length} UNLOCKED</span>
+                </div>
+                <ul className="space-y-2">
+                    {ACHIEVEMENTS.map((achievement) => {
+                        const done = unlocked.includes(achievement.id);
+                        return (
+                            <li
+                                key={achievement.id}
+                                className={`border p-2 ${done ? 'border-ut-yellow/60 bg-yellow-400/5' : 'border-white/10'}`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {done ? (
+                                        <CheckCircle2 size={14} className="text-ut-yellow shrink-0" />
+                                    ) : (
+                                        <Lock size={14} className="text-gray-600 shrink-0" />
+                                    )}
+                                    <span className={`font-8bit text-[10px] ${done ? 'text-ut-yellow' : 'text-gray-500'}`}>
+                                        {done ? achievement.title : '????'}
+                                    </span>
+                                </div>
+                                <p className={`font-pixel text-xs mt-1 ${done ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    {done ? achievement.description : `Hint: ${achievement.hint}`}
+                                </p>
+                            </li>
+                        );
+                    })}
                 </ul>
             </Panel>
 

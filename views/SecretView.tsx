@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     MessageSquare, BarChart3, Code2, Sparkles, Trophy,
     Github, ArrowLeft, CheckCircle2, Circle, Terminal,
-    Lock, Unlock, Music, PlayCircle, Award
+    Lock, Unlock, Music, PlayCircle, Award, Send
 } from 'lucide-react';
 import { Typewriter } from '../components/Typewriter';
 import { playConfirm, playGlitch, playHeal, playMenuMove } from '../utils/sound';
@@ -434,6 +434,16 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                         );
                     })}
                 </ul>
+                <div className="mt-4 border-t border-white/10 pt-4">
+                    <a
+                        href="mailto:diegoshoya2017@gmail.com?subject=Portfolio%20feedback"
+                        onMouseEnter={() => playMenuMove()}
+                        onClick={() => playConfirm()}
+                        className="flex items-center justify-center gap-2 font-8bit text-[10px] border border-ut-yellow/60 text-ut-yellow px-4 py-3 hover:bg-ut-yellow hover:text-black transition-colors"
+                    >
+                        <Send size={12} /> SEND FEEDBACK
+                    </a>
+                </div>
             </Panel>
 
             {/* True secret */}

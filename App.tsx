@@ -109,6 +109,7 @@ const App: React.FC = () => {
   // Ref to prevent double-counting in React Strict Mode
   const hasIncrementedRef = useRef(false);
   const transitionTimeoutRef = useRef<number | null>(null);
+  const sequenceRef = useRef<ViewState[]>([]);
   const avatarMessageTimerRef = useRef<number | null>(null);
 
   // Load visit count and city from localStorage, and fetch city if not found
@@ -200,7 +201,7 @@ const App: React.FC = () => {
   }, [gameRoute, hasStarted]);
 
   const transitionTo = (target: ViewState, glitch = false) => {
-    if (transitioning) return;
+    // Retarget instead of dropping the click while a previous transition runs.
     if (glitch) {
       playGlitch();
     } else {
@@ -338,6 +339,7 @@ const App: React.FC = () => {
     setCurrentHpValue(MAX_HP);
     setView(ViewState.INTRO);
     setSecretUnlocked(false);
+    sequenceRef.current = [];
     setButtonSequence([]);
     setTransitioning(false);
     setShowControls(false);
@@ -361,19 +363,21 @@ const App: React.FC = () => {
 
   // Handle view change with sequence tracking
   const handleViewChange = (newView: ViewState) => {
-    if (transitioning || ending) return;
+    if (ending) return;
 
     // Already on this section
     if (newView === view && newView !== ViewState.SECRET) return;
 
-    // Don't track if already unlocked or if it's the secret view
-    if (secretUnlocked || newView === ViewState.SECRET) {
+    // The sequence must keep working after the room has been unlocked once,
+    // otherwise leaving the room makes it unreachable until a page reload.
+    if (newView === ViewState.SECRET) {
       transitionTo(newView);
       return;
     }
 
-    // Add to sequence
-    const newSequence = [...buttonSequence, newView];
+    // Use a ref so rapid clicks do not read a stale sequence.
+    const newSequence = [...sequenceRef.current, newView];
+    sequenceRef.current = newSequence;
     setButtonSequence(newSequence);
 
     // Check if the correct sequence is completed: ACT → ITEM → MERCY → FIGHT

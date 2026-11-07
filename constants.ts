@@ -102,7 +102,7 @@ export const SKILLS: Skill[] = [
 export const HISTORY: Experience[] = [
   {
     role: 'FULL-STACK ENGINEER',
-    company: 'IN-HOUSE WEB SERVICE',
+    company: '??????',
     year: '2026 APR',
     description: 'Ships features end to end: Java / Spring Boot APIs, Vue.js UI, Kubernetes and CI/CD.',
   },
@@ -123,7 +123,19 @@ export const HISTORY: Experience[] = [
 export const PLAYER_NAME = "SHOYA";
 export const PLAYER_ROLE = "FULL-STACK ENGINEER";
 export const PLAYER_LOCATION = "FUJISAWA, JAPAN";
-export const PLAYER_LV = 23;
+// LV is the player's age, derived from the birthday so it updates automatically.
+const BIRTHDAY = new Date(2002, 9, 7); // 2002-10-07
+
+const calculateAge = (birthday: Date, today: Date = new Date()): number => {
+  let age = today.getFullYear() - birthday.getFullYear();
+  const monthDiff = today.getMonth() - birthday.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthday.getDate())) {
+    age -= 1;
+  }
+  return age;
+};
+
+export const PLAYER_LV = calculateAge(BIRTHDAY);
 export const PLAYER_HP = "101/101";
 
 // Intro "Check" stats

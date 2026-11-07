@@ -5,6 +5,7 @@ import { Typewriter } from './Typewriter';
 import { GuestbookEntry } from '../types';
 import { API_ENDPOINTS } from '../config/api';
 import { unlockAchievement } from '../utils/achievements';
+import { PLAYER_LV } from '../constants';
 
 // API Configuration
 const API_URL = API_ENDPOINTS.GUESTBOOK;
@@ -161,7 +162,7 @@ export const SavePoint: React.FC = () => {
                 {view === 'MENU' ? 'SAVE POINT' : 'GUESTBOOK'}
               </span>
               <span className="font-pixel text-gray-400 text-sm">
-                {view === 'MENU' ? 'LV 23' : `${entries.length} RECORDS`}
+                {view === 'MENU' ? `LV ${PLAYER_LV}` : `${entries.length} RECORDS`}
               </span>
             </div>
 

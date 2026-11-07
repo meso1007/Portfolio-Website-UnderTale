@@ -69,10 +69,10 @@ export const SKILLS: Skill[] = [
     type: 'FRONT'
   },
   {
-    name: 'NEXT.JS',
-    level: 86,
-    description: 'Server-side rendering with Determination.',
-    type: 'FRONT'
+    name: 'PYTHON',
+    level: 74,
+    description: 'Mines data & calculates fluid dynamics.',
+    type: 'BACK'
   },
   {
     name: 'VUE.JS',
@@ -87,9 +87,9 @@ export const SKILLS: Skill[] = [
     type: 'TOOL'
   },
   {
-    name: 'DOCKER',
-    level: 82,
-    description: 'Seals the party in a portable box.',
+    name: 'JENKINS',
+    level: 78,
+    description: 'Automates the grind. Never skips a build.',
     type: 'TOOL'
   },
   {

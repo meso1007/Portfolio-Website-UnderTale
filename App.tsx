@@ -45,7 +45,7 @@ const AVATAR_HINTS = [
   "The path you are looking for is already written."
 ];
 
-const CRITICAL_LINE = "You're on your last legs. One more hit ends this timeline.";
+const CRITICAL_LINE = "Please... don't. I'll write the tests. I'll fix the bugs. I'll do anything.";
 
 const WEB_DEV_PAINS = [
   "MERGE CONFLICT!",
@@ -518,7 +518,10 @@ const App: React.FC = () => {
                         <div className="w-10 h-10 rounded-md bg-ut-yellow border-2 border-black flex items-center justify-center shadow-[0_0_12px_rgba(250,204,21,0.8)]">
                           <span className="font-8bit text-lg leading-none text-black">!</span>
                         </div>
-                        <div className="absolute -bottom-1 left-2 w-3 h-3 bg-ut-yellow border-b-2 border-r-2 border-black rotate-45" />
+                        <div className="absolute -bottom-1.5 left-1 w-3.5 h-3.5">
+                          <div className="absolute inset-0 bg-black" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
+                          <div className="absolute inset-[1.5px] bg-ut-yellow" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
+                        </div>
                       </div>
                     </div>
                   )}

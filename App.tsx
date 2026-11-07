@@ -458,7 +458,7 @@ const App: React.FC = () => {
                   )}
 
                   {/* Name Tag */}
-                  <div className={`relative z-10 mx-auto mt-2 w-fit bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-2 md:px-3 py-1 whitespace-nowrap`}>
+                  <div className={`relative z-10 mx-auto mt-2 w-40 md:w-52 text-center bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-2 md:px-3 py-1 whitespace-nowrap`}>
                     <span className={`font-8bit text-[9px] md:text-xs leading-tight ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
                       {isGenocide ? 'ENEMY' : PLAYER_ROLE}
                     </span>

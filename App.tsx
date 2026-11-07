@@ -63,6 +63,7 @@ const App: React.FC = () => {
   const [bgmMuted, setBgmMutedState] = useState<boolean>(isBgmMuted());
   const [blockedMessage, setBlockedMessage] = useState<string | null>(null);
   const [routeFlash, setRouteFlash] = useState<boolean>(false);
+  const [routeFlip, setRouteFlip] = useState<boolean>(false);
 
   // Secret route sequence tracking
   const [buttonSequence, setButtonSequence] = useState<ViewState[]>([]);
@@ -149,8 +150,13 @@ const App: React.FC = () => {
     setBgmTrack(bgmTrackFor(gameRoute));
     if (gameRoute === GameRoute.GENOCIDE) {
       setRouteFlash(true);
-      const timer = window.setTimeout(() => setRouteFlash(false), 600);
-      return () => window.clearTimeout(timer);
+      setRouteFlip(true);
+      const flashTimer = window.setTimeout(() => setRouteFlash(false), 600);
+      const flipTimer = window.setTimeout(() => setRouteFlip(false), 750);
+      return () => {
+        window.clearTimeout(flashTimer);
+        window.clearTimeout(flipTimer);
+      };
     }
   }, [gameRoute, hasStarted]);
 
@@ -190,6 +196,11 @@ const App: React.FC = () => {
   };
 
   const handleHomeClick = () => {
+    // In Genocide mode the name button becomes a TRUE RESET.
+    if (isGenocide) {
+      handleReturnTitle();
+      return;
+    }
     if (view !== ViewState.INTRO) {
       transitionTo(ViewState.INTRO);
     }
@@ -215,7 +226,6 @@ const App: React.FC = () => {
         playGlitch();
         setShowControls(true); // Keep controls shown in Genocide
         setView(ViewState.INTRO);
-        setEnding('GENOCIDE');
       }, 1000);
     }
 
@@ -331,38 +341,46 @@ const App: React.FC = () => {
         return;
       }
 
+      // Desktop renders a single 4-column row, mobile a 2x2 grid.
+      const isWideLayout = window.matchMedia('(min-width: 768px)').matches;
+      const moveCursor = (next: number) => {
+        if (next === cursor) return;
+        setCursor(next);
+        playMenuMove();
+      };
+
       if (key === 'arrowleft' || key === 'a') {
         event.preventDefault();
-        if (cursor % 2 === 1) {
-          setCursor(cursor - 1);
-          playMenuMove();
+        if (isWideLayout) {
+          moveCursor(Math.max(0, cursor - 1));
+        } else if (cursor % 2 === 1) {
+          moveCursor(cursor - 1);
         }
         return;
       }
 
       if (key === 'arrowright' || key === 'd') {
         event.preventDefault();
-        if (cursor % 2 === 0) {
-          setCursor(cursor + 1);
-          playMenuMove();
+        if (isWideLayout) {
+          moveCursor(Math.min(VIEW_ORDER.length - 1, cursor + 1));
+        } else if (cursor % 2 === 0) {
+          moveCursor(cursor + 1);
         }
         return;
       }
 
       if (key === 'arrowup' || key === 'w') {
         event.preventDefault();
-        if (cursor >= 2) {
-          setCursor(cursor - 2);
-          playMenuMove();
+        if (!isWideLayout && cursor >= 2) {
+          moveCursor(cursor - 2);
         }
         return;
       }
 
       if (key === 'arrowdown' || key === 's') {
         event.preventDefault();
-        if (cursor < 2) {
-          setCursor(cursor + 2);
-          playMenuMove();
+        if (!isWideLayout && cursor < 2) {
+          moveCursor(cursor + 2);
         }
         return;
       }
@@ -440,8 +458,8 @@ const App: React.FC = () => {
                   )}
 
                   {/* Name Tag */}
-                  <div className={`absolute -bottom-4 left-1/2 -translate-x-1/2 bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-3 py-1 whitespace-nowrap z-10`}>
-                    <span className={`font-8bit mb-4 text-xs ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
+                  <div className={`absolute -bottom-5 left-1/2 -translate-x-1/2 bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-2 md:px-3 py-1 z-10 max-w-[200px] md:max-w-[260px] text-center`}>
+                    <span className={`font-8bit text-[9px] md:text-xs leading-tight break-words ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
                       {isGenocide ? 'ENEMY' : PLAYER_ROLE}
                     </span>
                   </div>
@@ -531,7 +549,7 @@ const App: React.FC = () => {
       case ViewState.MERCY:
         return <MercyView route={gameRoute} onPacifistTrigger={handlePacifistTrigger} />;
       case ViewState.SECRET:
-        return <SecretView route={gameRoute} />;
+        return <SecretView route={gameRoute} onClose={handleHomeClick} />;
       default:
         return null;
     }
@@ -571,7 +589,10 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-black text-white p-4 md:p-8 flex flex-col items-center justify-center font-sans ${isAttacked ? 'animate-shake' : ''}`}>
+    <div
+      className={`min-h-screen bg-black text-white p-4 md:p-8 flex flex-col items-center justify-center font-sans ${isAttacked ? 'animate-shake' : ''} ${routeFlip ? 'animate-flip' : ''}`}
+      style={{ perspective: '1200px' }}
+    >
 
       {isGenocide && <div className="scanlines"></div>}
 

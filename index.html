@@ -41,10 +41,16 @@
               '60%': { transform: 'translate(2px, 2px)' },
               '80%': { transform: 'translate(2px, -2px)' },
               '100%': { transform: 'translate(0)' },
+            },
+            flip: {
+              '0%': { transform: 'rotateX(0deg)' },
+              '50%': { transform: 'rotateX(90deg)' },
+              '100%': { transform: 'rotateX(0deg)' },
             }
           },
           animation: {
             shake: 'shake 0.2s ease-in-out infinite',
+            flip: 'flip 0.75s ease-in-out',
             float: 'float 2s ease-in-out infinite',
             glitch: 'glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite',
           }

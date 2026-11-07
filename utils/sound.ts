@@ -4,7 +4,8 @@
 let audioContext: AudioContext | null = null;
 
 export const getAudioContext = () => {
-  if (!audioContext) {
+  // Recreate the context if the browser closed it (rare, but recoverable).
+  if (!audioContext || audioContext.state === 'closed') {
     // Cross-browser compatibility
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     audioContext = new AudioContextClass();
@@ -134,7 +135,11 @@ export const playConfirm = () => {
 // 5. Text Sound (Classic RPG Blip)
 export const playText = () => {
   const ctx = getAudioContext();
-  if (!ctx || ctx.state === 'suspended') return; // Don't force resume on every char
+  if (!ctx) return;
+  // Keep the context alive without blocking the character animation.
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
   const now = ctx.currentTime;
   
   const osc = ctx.createOscillator();
@@ -181,7 +186,10 @@ export const playSave = () => {
 // 7. Menu Move/Hover (Pi)
 export const playMenuMove = () => {
   const ctx = getAudioContext();
-  if (!ctx || ctx.state === 'suspended') return; // Only play hover if context is active
+  if (!ctx) return;
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
   const now = ctx.currentTime;
   
   const osc = ctx.createOscillator();

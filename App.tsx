@@ -145,6 +145,24 @@ const App: React.FC = () => {
   const sequenceRef = useRef<ViewState[]>([]);
   const avatarMessageTimerRef = useRef<number | null>(null);
 
+  // Keep the audio context usable after tab switches or autoplay suspension.
+  useEffect(() => {
+    const resume = () => { void ensureContext(); };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void ensureContext();
+      }
+    };
+    window.addEventListener('pointerdown', resume, { once: true });
+    window.addEventListener('keydown', resume, { once: true });
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      window.removeEventListener('pointerdown', resume);
+      window.removeEventListener('keydown', resume);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
+
   // Load visit count and city from localStorage, and fetch city if not found
   useEffect(() => {
     // Visit Count Logic - increment only once (prevent double-counting in Strict Mode)

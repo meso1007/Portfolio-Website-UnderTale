@@ -25,17 +25,31 @@ const DAMAGE_PER_HIT = 25;
 
 const VIEW_ORDER = [ViewState.FIGHT, ViewState.ACT, ViewState.ITEM, ViewState.MERCY];
 
-const AVATAR_LINES = [
+const AVATAR_LINES_SUBTLE = [
   "Still here? Good. Look around.",
   "I built this whole thing, you know.",
-  "DETERMINATION is just another word for discipline.",
-  "You can press X to go back anytime.",
-  "The secret is closer than you think.",
-  "My favorite project? Probably Tagoly.",
-  "This site has three routes. You found one.",
   "Coffee is a valid tech stack.",
+  "My favorite project? Probably Tagoly.",
+  "Some doors only open in a certain order.",
+  "Have you tried the star at the bottom?",
+];
+
+const AVATAR_LINES_MEDIUM = [
+  "This site has three routes. You found one.",
+  "The secret is closer than you think.",
   "If you're hiring, my inbox is open.",
-  "Try attacking me. See what happens."
+  "The star at the bottom right is not decoration.",
+  "Try pressing the menu in a different order.",
+  "Press the star. I read every message.",
+];
+
+const AVATAR_LINES_STRONG = [
+  "SKILLS → HISTORY → CONTACT → PROJECTS. That is the order.",
+  "Attack me five times if you want the other ending.",
+  "The star saves your message. Go on.",
+  "You already know the order. Use it.",
+  "There is a room that does not exist. You are close.",
+  "Still here? Good. Look around.",
 ];
 
 const FIRST_MEETING_LINES = [
@@ -43,7 +57,7 @@ const FIRST_MEETING_LINES = [
   "First time here? Welcome to my little timeline.",
   "I don't think we've met. I'm Shoya.",
   "You're new. I can tell.",
-  "Take your time. There is no wrong way to look around."
+  "By the way, the star at the bottom saves your message."
 ];
 
 const AVATAR_HINTS = [
@@ -281,8 +295,8 @@ const App: React.FC = () => {
       return;
     }
 
-    // First visit gets a first-meeting line instead of the usual banter.
-    if (visitCount <= 1) {
+    // The first three clicks of a first visit are a proper introduction.
+    if (visitCount <= 1 && nextCount <= 3) {
       const line = FIRST_MEETING_LINES[Math.floor(Math.random() * FIRST_MEETING_LINES.length)];
       showAvatarLine(line, false, 3000);
       return;
@@ -294,7 +308,13 @@ const App: React.FC = () => {
       return;
     }
 
-    const line = AVATAR_LINES[Math.floor(Math.random() * AVATAR_LINES.length)];
+    // Hints get stronger the more the avatar is pressed in one session.
+    const pool = nextCount <= 4
+      ? AVATAR_LINES_SUBTLE
+      : nextCount <= 9
+        ? AVATAR_LINES_MEDIUM
+        : AVATAR_LINES_STRONG;
+    const line = pool[Math.floor(Math.random() * pool.length)];
     showAvatarLine(line, false, 3000);
   };
 
@@ -446,6 +466,11 @@ const App: React.FC = () => {
       }
 
       const key = event.key.toLowerCase();
+
+      // Let modals (reset confirmation, etc.) own the keyboard.
+      if (document.body.getAttribute('data-modal') === 'open') {
+        return;
+      }
 
       if (key === 'm') {
         event.preventDefault();

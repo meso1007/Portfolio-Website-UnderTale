@@ -2,10 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     MessageSquare, BarChart3, Code2, Sparkles, Trophy,
     Github, ArrowLeft, CheckCircle2, Circle, Terminal,
-    Lock, Unlock, Music, PlayCircle, Award
+    Lock, Unlock, Music, PlayCircle, Award, RotateCcw, AlertTriangle
 } from 'lucide-react';
 import { Typewriter } from '../components/Typewriter';
-import { playConfirm, playGlitch, playHeal, playMenuMove } from '../utils/sound';
+import { playConfirm, playGlitch, playHeal, playMenuMove, playSave } from '../utils/sound';
 import { BgmTrack, setBgmTrack } from '../utils/bgm';
 import { ACHIEVEMENTS, getUnlockedAchievements, onAchievementsChanged, unlockAchievement } from '../utils/achievements';
 import { GameRoute } from '../types';
@@ -72,6 +72,7 @@ const Panel: React.FC<{ icon: React.ReactNode; title: string; children: React.Re
 export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     const isGenocide = route === GameRoute.GENOCIDE;
     const [decrypted, setDecrypted] = useState(false);
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [usedTerminal, setUsedTerminal] = useState(false);
     const [usedJukebox, setUsedJukebox] = useState(false);
     const [trueSecretShown, setTrueSecretShown] = useState(false);
@@ -80,6 +81,7 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     const [command, setCommand] = useState('');
     const [unlocked, setUnlocked] = useState<string[]>(getUnlockedAchievements());
     const terminalRef = useRef<HTMLDivElement | null>(null);
+    const completionSoundPlayed = useRef(false);
 
     useEffect(() => {
         if (terminalRef.current) {
@@ -103,6 +105,24 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
             unlockAchievement('true-secret');
         }
     }, [usedTerminal, usedJukebox, decrypted, trueSecretShown]);
+
+    const allAchievements = unlocked.length >= ACHIEVEMENTS.length;
+
+    useEffect(() => {
+        if (allAchievements && !completionSoundPlayed.current) {
+            completionSoundPlayed.current = true;
+            playHeal();
+        }
+    }, [allAchievements]);
+
+    useEffect(() => {
+        if (showResetConfirm) {
+            document.body.setAttribute('data-modal', 'open');
+        } else {
+            document.body.removeAttribute('data-modal');
+        }
+        return () => document.body.removeAttribute('data-modal');
+    }, [showResetConfirm]);
 
     if (isGenocide) {
         return (
@@ -130,6 +150,40 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
         playGlitch();
         setDecrypted(true);
         unlockAchievement('decrypted');
+    };
+
+    const handleResetData = () => {
+        setShowResetConfirm(true);
+        playConfirm();
+    };
+
+    const performResetData = () => {
+        playSave();
+        const knownKeys = [
+            'visit_count',
+            'user_city',
+            'undertale_guestbook',
+            'undertale_bgm_muted',
+            'undertale_achievements',
+            'undertale_reset_count',
+        ];
+
+        try {
+            knownKeys.forEach((key) => {
+                localStorage.removeItem(key);
+                sessionStorage.removeItem(key);
+            });
+            Object.keys(localStorage)
+                .filter((key) => key.startsWith('undertale_'))
+                .forEach((key) => localStorage.removeItem(key));
+            Object.keys(sessionStorage)
+                .filter((key) => key.startsWith('undertale_'))
+                .forEach((key) => sessionStorage.removeItem(key));
+        } catch {
+            // ignore storage errors
+        }
+
+        window.location.reload();
     };
 
     const runCommand = (raw: string) => {
@@ -436,6 +490,34 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                 </ul>
             </Panel>
 
+            {/* Perfect archive */}
+            {allAchievements && (
+                <section className="relative border-4 border-ut-yellow bg-gradient-to-b from-yellow-400/20 to-transparent p-6 text-center animate-pulse shadow-[0_0_60px_rgba(250,204,21,0.25)]">
+                    <div className="flex justify-center mb-3">
+                        <Trophy size={32} className="text-ut-yellow" />
+                    </div>
+                    <p className="font-8bit text-[9px] tracking-[0.3em] text-gray-500 mb-2">
+                        {unlocked.length} / {ACHIEVEMENTS.length} COMPLETE
+                    </p>
+                    <h3 className="font-8bit text-sm md:text-xl text-ut-yellow mb-4">
+                        ✦ ARCHIVE COMPLETE ✦
+                    </h3>
+                    <div className="space-y-2 font-pixel text-yellow-100 text-sm">
+                        <p>* You have seen everything this timeline has to offer.</p>
+                        <p>* Not many visitors make it this far.</p>
+                        <p>* Email me with the word DETERMINATION, and I will know you finished it.</p>
+                    </div>
+                    <a
+                        href="mailto:diegoshoya2017@gmail.com?subject=DETERMINATION"
+                        onMouseEnter={() => playMenuMove()}
+                        onClick={() => playConfirm()}
+                        className="inline-flex items-center gap-2 mt-5 font-8bit text-[10px] border-2 border-ut-yellow text-ut-yellow px-5 py-3 hover:bg-ut-yellow hover:text-black transition-colors"
+                    >
+                        SEND PROOF
+                    </a>
+                </section>
+            )}
+
             {/* True secret */}
             {trueSecretShown && (
                 <section className="relative border-4 border-ut-yellow bg-yellow-400/10 p-6 text-center animate-pulse">
@@ -449,6 +531,24 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                     </div>
                 </section>
             )}
+
+            {/* System / reset */}
+            <Panel icon={<RotateCcw size={18} />} title="SYSTEM">
+                <div className="flex items-start gap-2 font-pixel text-xs text-gray-400 mb-4">
+                    <AlertTriangle size={14} className="mt-0.5 text-ut-yellow shrink-0" />
+                    <span>
+                        Clears local data only: visit count, reset count, guestbook cache,
+                        achievements and BGM preference. The page will reload.
+                    </span>
+                </div>
+                <button
+                    onClick={handleResetData}
+                    onMouseEnter={() => playMenuMove()}
+                    className="w-full font-8bit text-[10px] border-2 border-ut-yellow/60 text-ut-yellow px-4 py-3 hover:bg-ut-yellow hover:text-black transition-colors"
+                >
+                    RESET LOCAL DATA
+                </button>
+            </Panel>
 
             {/* Footer actions */}
             <div className="relative flex flex-col md:flex-row items-center justify-center gap-4 pt-2">
@@ -472,6 +572,44 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                     </button>
                 )}
             </div>
+
+            {/* Reset confirmation */}
+            {showResetConfirm && (
+                <div
+                    className="fixed inset-0 z-[110] bg-black/85 flex items-center justify-center p-4"
+                    onClick={() => { playConfirm(); setShowResetConfirm(false); }}
+                >
+                    <div
+                        className="w-full max-w-md border-4 border-ut-red bg-black p-6"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="flex items-center gap-3 mb-4">
+                            <AlertTriangle size={20} className="text-ut-red" />
+                            <h3 className="font-8bit text-ut-red text-sm">DELETE LOCAL DATA?</h3>
+                        </div>
+                        <div className="space-y-2 font-pixel text-gray-300 text-sm mb-6">
+                            <p>* Visit count, reset count, guestbook cache, achievements and BGM preference will be erased.</p>
+                            <p className="text-ut-red animate-pulse">* This cannot be undone.</p>
+                        </div>
+                        <div className="flex flex-col md:flex-row gap-3">
+                            <button
+                                onClick={() => { playConfirm(); setShowResetConfirm(false); }}
+                                onMouseEnter={() => playMenuMove()}
+                                className="flex-1 font-8bit text-[10px] border-2 border-white text-white px-4 py-3 hover:bg-white hover:text-black transition-colors"
+                            >
+                                CANCEL
+                            </button>
+                            <button
+                                onClick={performResetData}
+                                onMouseEnter={() => playMenuMove()}
+                                className="flex-1 font-8bit text-[10px] border-2 border-ut-red text-ut-red px-4 py-3 hover:bg-ut-red hover:text-black transition-colors"
+                            >
+                                ERASE EVERYTHING
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

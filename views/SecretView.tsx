@@ -5,6 +5,7 @@ import {
     Lock, Unlock, Music, PlayCircle, Award, RotateCcw, AlertTriangle
 } from 'lucide-react';
 import { Typewriter } from '../components/Typewriter';
+import { ArchiveEnding } from '../components/ArchiveEnding';
 import { playConfirm, playGlitch, playHeal, playMenuMove, playSave } from '../utils/sound';
 import { BgmTrack, setBgmTrack } from '../utils/bgm';
 import { ACHIEVEMENTS, getUnlockedAchievements, onAchievementsChanged, unlockAchievement } from '../utils/achievements';
@@ -73,6 +74,7 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     const isGenocide = route === GameRoute.GENOCIDE;
     const [decrypted, setDecrypted] = useState(false);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [showEnding, setShowEnding] = useState(false);
     const [usedTerminal, setUsedTerminal] = useState(false);
     const [usedJukebox, setUsedJukebox] = useState(false);
     const [trueSecretShown, setTrueSecretShown] = useState(false);
@@ -116,13 +118,13 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     }, [allAchievements]);
 
     useEffect(() => {
-        if (showResetConfirm) {
+        if (showResetConfirm || showEnding) {
             document.body.setAttribute('data-modal', 'open');
         } else {
             document.body.removeAttribute('data-modal');
         }
         return () => document.body.removeAttribute('data-modal');
-    }, [showResetConfirm]);
+    }, [showResetConfirm, showEnding]);
 
     if (isGenocide) {
         return (
@@ -155,6 +157,12 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     const handleResetData = () => {
         setShowResetConfirm(true);
         playConfirm();
+    };
+
+    const handleOpenEnding = () => {
+        playSave();
+        setShowEnding(true);
+        window.setTimeout(() => playHeal(), 300);
     };
 
     const performResetData = () => {
@@ -507,14 +515,13 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                         <p>* Not many visitors make it this far.</p>
                         <p>* Email me with the word DETERMINATION, and I will know you finished it.</p>
                     </div>
-                    <a
-                        href="mailto:diegoshoya2017@gmail.com?subject=DETERMINATION"
+                    <button
+                        onClick={handleOpenEnding}
                         onMouseEnter={() => playMenuMove()}
-                        onClick={() => playConfirm()}
-                        className="inline-flex items-center gap-2 mt-5 font-8bit text-[10px] border-2 border-ut-yellow text-ut-yellow px-5 py-3 hover:bg-ut-yellow hover:text-black transition-colors"
+                        className="inline-flex items-center gap-2 mt-5 font-8bit text-[10px] border-2 border-ut-yellow text-ut-yellow px-6 py-3 hover:bg-ut-yellow hover:text-black transition-colors"
                     >
-                        SEND PROOF
-                    </a>
+                        ENDING
+                    </button>
                 </section>
             )}
 
@@ -572,6 +579,17 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                     </button>
                 )}
             </div>
+
+            {/* Archive ending */}
+            {showEnding && (
+                <ArchiveEnding
+                    onStay={() => setShowEnding(false)}
+                    onReturnTitle={() => {
+                        setShowEnding(false);
+                        if (onClose) onClose();
+                    }}
+                />
+            )}
 
             {/* Reset confirmation */}
             {showResetConfirm && (

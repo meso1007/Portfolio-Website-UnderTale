@@ -145,7 +145,7 @@ export const PLAYER_HP = "101/101";
 export const PLAYER_TRAITS = [
   "* A full-stack builder: backend, frontend, infra, and DevOps.",
   "* Master of both Piano keys and Keyboard keys.",
-  "* Bilingual: English and Japanese. Studied and worked in Canada.",
+  "* Bilingual: English and Japanese. Studied in Canada.",
   "* Seeking inspiration in foreign lands."
 ];
 

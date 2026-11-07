@@ -518,10 +518,7 @@ const App: React.FC = () => {
                         <div className="w-10 h-10 rounded-md bg-ut-yellow border-2 border-black flex items-center justify-center shadow-[0_0_12px_rgba(250,204,21,0.8)]">
                           <span className="font-8bit text-lg leading-none text-black">!</span>
                         </div>
-                        <div className="absolute -bottom-1.5 left-1 w-3.5 h-3.5">
-                          <div className="absolute inset-0 bg-black" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
-                          <div className="absolute inset-[1.5px] bg-ut-yellow" style={{ clipPath: 'polygon(0 0, 100% 0, 0 100%)' }} />
-                        </div>
+
                       </div>
                     </div>
                   )}
@@ -559,7 +556,7 @@ const App: React.FC = () => {
                       onMouseEnter={() => playMenuMove()}
                       tabIndex={showControls ? 0 : -1}
                     >
-                      <Swords size={20} className="shrink-0" strokeWidth={2.5} />
+                      <Swords size={20} className="shrink-0 text-ut-red group-hover:text-black" strokeWidth={2.5} />
                       <span className="font-8bit text-ut-red group-hover:text-black text-sm md:text-base tracking-widest">
                         FIGHT
                       </span>

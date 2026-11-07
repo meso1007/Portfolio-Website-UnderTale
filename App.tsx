@@ -618,7 +618,7 @@ const App: React.FC = () => {
                   text={isGenocide
                     ? "* (The developer turned to dust.)"
                     : (isCritical
-                      ? "* One more hit and this timeline ends."
+                      ? "* The developer is on their knees, begging."
                       : (isPacifist ? "* The developer is happy!" : "* You encountered a wild developer!"))}
                   speed={40}
                   className={`font-pixel ${isGenocide ? 'text-ut-red' : 'text-ut-gray'}`}

@@ -513,17 +513,12 @@ const App: React.FC = () => {
 
                   {/* Important hint marker */}
                   {avatarImportant && !isGenocide && (
-                    <div className="absolute -top-5 -right-5 z-[70] pointer-events-none animate-bounce">
-                      <div
-                        className="w-16 h-16 bg-black p-[3px] drop-shadow-[0_0_14px_rgba(250,204,21,0.95)]"
-                        style={{ clipPath: 'polygon(50% 0%, 62% 18%, 80% 8%, 81% 28%, 100% 28%, 88% 44%, 100% 60%, 81% 60%, 82% 82%, 64% 72%, 50% 92%, 36% 72%, 18% 82%, 19% 60%, 0% 60%, 12% 44%, 0% 28%, 19% 28%, 20% 8%, 38% 18%)' }}
-                      >
-                        <div
-                          className="w-full h-full bg-ut-yellow text-black flex items-center justify-center"
-                          style={{ clipPath: 'polygon(50% 0%, 62% 18%, 80% 8%, 81% 28%, 100% 28%, 88% 44%, 100% 60%, 81% 60%, 82% 82%, 64% 72%, 50% 92%, 36% 72%, 18% 82%, 19% 60%, 0% 60%, 12% 44%, 0% 28%, 19% 28%, 20% 8%, 38% 18%)' }}
-                        >
-                          <span className="font-8bit text-2xl leading-none">!</span>
+                    <div className="absolute top-2 -right-4 z-[70] pointer-events-none animate-bounce">
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full bg-ut-yellow border-2 border-black flex items-center justify-center shadow-[0_0_12px_rgba(250,204,21,0.8)]">
+                          <span className="font-8bit text-lg leading-none text-black">!</span>
                         </div>
+                        <div className="absolute -bottom-1 left-2 w-3 h-3 bg-ut-yellow border-b-2 border-r-2 border-black rotate-45" />
                       </div>
                     </div>
                   )}

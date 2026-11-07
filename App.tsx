@@ -785,7 +785,7 @@ const App: React.FC = () => {
   return (
     <div
       className={`min-h-screen bg-black text-white p-4 md:p-8 flex flex-col items-center justify-center font-sans overflow-x-hidden ${isAttacked ? 'animate-shake' : ''} ${routeFlip ? 'animate-flip' : ''}`}
-      style={{ perspective: '1200px' }}
+      style={routeFlip ? { perspective: '1200px' } : undefined}
     >
 
       {isGenocide && <div className="scanlines"></div>}

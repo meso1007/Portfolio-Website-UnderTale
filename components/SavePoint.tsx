@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Star } from 'lucide-react';
 import { playSave, playMenuMove, playConfirm, playSelect } from '../utils/sound';
 import { Typewriter } from './Typewriter';
@@ -152,7 +153,7 @@ export const SavePoint: React.FC = () => {
       </button>
 
       {/* The Save Modal */}
-      {isOpen && (
+      {isOpen && createPortal(
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="w-full max-w-lg border-4 border-white bg-black p-6 relative">
 
@@ -274,7 +275,8 @@ export const SavePoint: React.FC = () => {
             )}
 
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

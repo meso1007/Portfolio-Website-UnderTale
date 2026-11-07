@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { SoulHeart } from './SoulHeart';
 import { Typewriter } from './Typewriter';
 import { playConfirm, playHeal, playMenuMove, playSave } from '../utils/sound';
@@ -25,7 +26,7 @@ export const Ending: React.FC<EndingProps> = ({ type, onReturnTitle }) => {
     onReturnTitle();
   };
 
-  return (
+  return createPortal(
     <div className={`fixed inset-0 z-[100] bg-black flex items-center justify-center p-6 ${isGenocide ? 'scanlines' : ''}`}>
       <div className="w-full max-w-xl text-center">
         {isGenocide ? (
@@ -86,6 +87,7 @@ export const Ending: React.FC<EndingProps> = ({ type, onReturnTitle }) => {
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

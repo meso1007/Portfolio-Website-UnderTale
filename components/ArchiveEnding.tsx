@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Star } from 'lucide-react';
 import { SoulHeart } from './SoulHeart';
 import { Typewriter } from './Typewriter';
@@ -23,7 +24,7 @@ const STARS = [
 ];
 
 export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTitle }) => {
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[120] bg-black overflow-y-auto">
       <div className="relative min-h-full flex items-center justify-center p-6 py-12">
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -84,6 +85,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

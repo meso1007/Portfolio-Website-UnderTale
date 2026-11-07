@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     MessageSquare, BarChart3, Code2, Sparkles, Trophy,
     Github, ArrowLeft, CheckCircle2, Circle, Terminal,
@@ -592,7 +593,7 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
             )}
 
             {/* Reset confirmation */}
-            {showResetConfirm && (
+            {showResetConfirm && createPortal(
                 <div
                     className="fixed inset-0 z-[110] bg-black/85 flex items-center justify-center p-4"
                     onClick={() => { playConfirm(); setShowResetConfirm(false); }}
@@ -626,7 +627,8 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

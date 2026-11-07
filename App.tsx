@@ -48,6 +48,17 @@ const AVATAR_HINTS = [
 
 const CRITICAL_LINE = "Please... don't. I'll write the tests. I'll fix the bugs. I'll do anything.";
 
+const ordinal = (value: number): string => {
+  const mod100 = value % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${value}th`;
+  switch (value % 10) {
+    case 1: return `${value}st`;
+    case 2: return `${value}nd`;
+    case 3: return `${value}rd`;
+    default: return `${value}th`;
+  }
+};
+
 const RESET_LINES = [
   "Why... why did you defeat me?",
   "Again? Do you have nothing better to do?",
@@ -259,6 +270,12 @@ const App: React.FC = () => {
     if (nextCount % 5 === 0) {
       const hint = AVATAR_HINTS[Math.floor(nextCount / 5 - 1) % AVATAR_HINTS.length];
       showAvatarLine(hint, true, 4000);
+      return;
+    }
+
+    // Occasionally guess the visitor's visit number to surprise them.
+    if (visitCount > 1 && Math.random() < 0.3) {
+      showAvatarLine(`This is your ${ordinal(visitCount)} visit, isn't it?`, true, 4000);
       return;
     }
 

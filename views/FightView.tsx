@@ -1,72 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Project, GameRoute } from '../types';
 import { PROJECTS } from '../constants';
 import { SoulHeart } from '../components/SoulHeart';
 import { Typewriter } from '../components/Typewriter';
 import { playConfirm, playMenuMove, playCancel } from '../utils/sound';
 
-import { API_ENDPOINTS } from '../config/api';
-
-const API_URL = API_ENDPOINTS.PROJECTS;
-
 interface FightViewProps {
   route: GameRoute;
 }
 
 export const FightView: React.FC<FightViewProps> = ({ route }) => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const projects = PROJECTS;
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const isGenocide = route === GameRoute.GENOCIDE;
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        // Check cache first
-        const cachedData = localStorage.getItem('projects_cache');
-        const cacheTimestamp = localStorage.getItem('projects_cache_timestamp');
-        const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
-
-        if (cachedData && cacheTimestamp) {
-          const age = Date.now() - parseInt(cacheTimestamp);
-          if (age < CACHE_DURATION) {
-            console.log('Using cached projects data');
-            const cached = JSON.parse(cachedData);
-            setProjects(cached);
-            setIsLoading(false);
-            return;
-          }
-        }
-
-        // Cache expired or doesn't exist, fetch from API
-        console.log('Fetching fresh data from API');
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
-
-        console.log('Fetched data from API:', data);
-        console.log('Data length:', data?.length);
-
-        if (data && data.length > 0) {
-          console.log('Setting projects from API:', data);
-          setProjects(data);
-          // Save to cache
-          localStorage.setItem('projects_cache', JSON.stringify(data));
-          localStorage.setItem('projects_cache_timestamp', Date.now().toString());
-        } else {
-          console.log('Using fallback projects');
-          setProjects(PROJECTS);
-        }
-      } catch (e) {
-        console.error('Failed to fetch projects, using fallback:', e);
-        setProjects(PROJECTS);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
 
   const handleProjectClick = (p: Project) => {
     playConfirm();
@@ -77,16 +23,6 @@ export const FightView: React.FC<FightViewProps> = ({ route }) => {
     playCancel();
     setSelectedProject(null);
   };
-
-  if (isLoading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className={`font-pixel ${isGenocide ? 'text-ut-red' : 'text-white'} animate-pulse`}>
-          * Loading...
-        </div>
-      </div>
-    );
-  }
 
   if (selectedProject) {
     return (

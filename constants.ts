@@ -4,77 +4,131 @@ import { Project, Skill, Experience } from './types';
 export const PROJECTS: Project[] = [
   {
     id: 'p1',
-    name: 'OTODOKE LIFE',
-    description: 'Encodes heartfelt messages into QR codes for the future. (only in Japanese)',
-    tech: ['Next.js', 'TypeScript', 'TailwindCSS', 'Framer Motion'],
-    stats: { atk: 30, def: 80 },
-    link: "https://www.otodokelife.com/",
-    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&q=80', // 手紙やアートっぽい画像
+    name: 'TAGOLY (CLI)',
+    description: 'The smarter Git commit CLI. Detects scopes from staged files, lints messages, and ships via Homebrew and Scoop.',
+    tech: ['Go', 'CLI', 'Git', 'GoReleaser', 'Homebrew', 'Scoop'],
+    stats: { atk: 20, def: 90 },
+    link: 'https://github.com/meso1007/Tagoly',
+    image: 'https://raw.githubusercontent.com/meso1007/Tagoly/main/assets/readme/demo-crop.gif',
   },
   {
     id: 'p2',
-    name: 'GAS INSIGHT',
-    description: 'Analyzes news via Gemini AI. Reads the market\'s mind.',
-    tech: ['Go', 'Gemini API', 'SQLite', 'Docker', 'NEXT.js', 'TypeScript', 'TailwindCSS', 'Framer Motion'],
-    stats: { atk: 55, def: 15 },
-    link: 'https://github.com/meso1007/Gas-app',
-    image: 'https://images.unsplash.com/photo-1526304640152-d4619684e484?w=800&q=80',
+    name: 'OTODOKE LIFE',
+    description: 'Turns heartfelt messages into QR-coded letters you can keep. Built for simple writing and calm reading. (Japanese)',
+    tech: ['Next.js', 'TypeScript', 'TailwindCSS', 'Framer Motion'],
+    stats: { atk: 30, def: 80 },
+    link: 'https://next-qrcode-message-web-app.vercel.app',
+    image: 'https://raw.githubusercontent.com/meso1007/NEXT-QRcodeMessage-WebApp/main/public/readme/topPage.png',
   },
   {
     id: 'p3',
-    name: 'TAGOLY (CLI)',
-    description: 'Interactive CLI. Auto-detects scopes to keep history shiny.',
-    tech: ['Go', 'CLI', 'Git', "Homebrew", "Scoop"],
-    stats: { atk: 20, def: 90 },
-    link: 'https://github.com/meso1007/Tagoly',
-    image: 'https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=800&q=80',
+    name: 'CARTES',
+    description: 'An AI that reverse-engineers your goal into a learning roadmap, then quizzes you at every step.',
+    tech: ['Next.js', 'TypeScript', 'Go', 'Echo', 'PostgreSQL', 'Supabase', 'Gemini API', 'Docker'],
+    stats: { atk: 85, def: 70 },
+    link: 'https://cartes-three.vercel.app',
+    image: 'https://raw.githubusercontent.com/meso1007/logic-latch/main/frontend/public/logo.png',
+  },
+  {
+    id: 'p4',
+    name: 'DURIAN-MAP',
+    description: 'A map for finding independent cafés, with chain-store filtering and photos proxied through the API.',
+    tech: ['Next.js', 'TypeScript', 'Cloudflare Workers', 'Hono', 'Google Places API'],
+    stats: { atk: 70, def: 60 },
+    link: 'https://github.com/meso1007/Durian-Map',
+    image: 'https://raw.githubusercontent.com/meso1007/Durian-Map/main/designs/durian-map-tropical.png',
+  },
+  {
+    id: 'p5',
+    name: 'GAS INSIGHT',
+    description: 'Analyzes news via Gemini AI. Reads the market\'s mind.',
+    tech: ['Go', 'Gemini API', 'SQLite', 'Docker', 'Next.js', 'TypeScript'],
+    stats: { atk: 55, def: 15 },
+    link: 'https://github.com/meso1007/Gas-app',
+    image: '',
   },
 ];
 
 export const SKILLS: Skill[] = [
   {
+    name: 'JAVA / SPRING BOOT',
+    level: 84,
+    description: 'Casts enterprise-grade magic. Built for long battles.',
+    type: 'BACK'
+  },
+  {
     name: 'GO',
-    level: 76,
+    level: 80,
     description: 'Summons Goroutines for high-speed concurrency.',
     type: 'BACK'
   },
   {
-    name: 'PYTHON',
-    level: 74,
-    description: 'Mines data & calculates fluid dynamics.', // スクレイピングと流体力学の両方
-    type: 'BACK'
+    name: 'TYPESCRIPT',
+    level: 88,
+    description: 'Equips a static type shield against bugs.',
+    type: 'FRONT'
   },
   {
     name: 'NEXT.JS',
-    level: 88,
-    description: 'Server-side rendering with Determination.', // SSRと「決意」をかけた
+    level: 86,
+    description: 'Server-side rendering with Determination.',
     type: 'FRONT'
   },
   {
-    name: 'TYPESCRIPT',
-    level: 88,
-    description: 'Equips a static type shield against bugs.', // 静的型付けの「盾」を装備
+    name: 'VUE.JS',
+    level: 78,
+    description: 'A lighter blade that reacts to every move.',
     type: 'FRONT'
+  },
+  {
+    name: 'KUBERNETES',
+    level: 72,
+    description: 'Commands a fleet of containers. Auto-heals the party.',
+    type: 'TOOL'
+  },
+  {
+    name: 'DOCKER',
+    level: 82,
+    description: 'Seals the party in a portable box.',
+    type: 'TOOL'
+  },
+  {
+    name: 'ORACLE',
+    level: 70,
+    description: 'An ancient tome of data. Heavy, but reliable.',
+    type: 'TOOL'
+  },
+  {
+    name: 'REDIS',
+    level: 76,
+    description: 'Casts Haste. Everything resolves in a blink.',
+    type: 'TOOL'
   },
   {
     name: 'GIT',
-    level: 62,
-    description: 'Time travel capability (Save/Load).', // 時間旅行能力
+    level: 72,
+    description: 'Time travel capability (Save/Load).',
     type: 'TOOL'
   },
   {
     name: 'COFFEE',
     level: 99,
-    description: 'Restores HP. Essential for survival.', // HP回復アイテム
+    description: 'Restores HP. Essential for survival.',
     type: 'ITEM'
   },
 ];
 export const HISTORY: Experience[] = [
   {
-    role: 'WEB APP ENGINEER',
-    company: '??????',
+    role: 'FULL-STACK ENGINEER',
+    company: 'IN-HOUSE WEB SERVICE',
     year: '2026 APR',
-    description: 'Accepted the offer. Determination filled.',
+    description: 'Ships features end to end: Java / Spring Boot APIs, Vue.js UI, Kubernetes and CI/CD.',
+  },
+  {
+    role: 'OSS DEVELOPER',
+    company: 'GITHUB',
+    year: '2025 OCT',
+    description: 'Released Tagoly, a Go CLI that keeps Git history consistent.',
   },
   {
     role: 'STARTUP DEV INTERN',
@@ -91,16 +145,16 @@ export const HISTORY: Experience[] = [
 ];
 
 export const PLAYER_NAME = "SHOYA";
-export const PLAYER_ROLE = "WEB DEVELOPER";
+export const PLAYER_ROLE = "FULL-STACK ENGINEER";
 export const PLAYER_LOCATION = "FUJISAWA, JAPAN";
 export const PLAYER_LV = 23;
 export const PLAYER_HP = "101/101";
 
 // Intro "Check" stats
 export const PLAYER_TRAITS = [
-  "* A multi-class Creator: Code, Art, and Music.",
+  "* A full-stack builder: backend, frontend, infra, and DevOps.",
   "* Master of both Piano keys and Keyboard keys.",
-  "* Diving into the world of OSS.",
+  "* Shipping OSS: Tagoly, a Git commit CLI.",
   "* Seeking inspiration in foreign lands."
 ];
 

@@ -153,12 +153,14 @@ const App: React.FC = () => {
         void ensureContext();
       }
     };
-    window.addEventListener('pointerdown', resume, { once: true });
-    window.addEventListener('keydown', resume, { once: true });
+    window.addEventListener('pointerdown', resume, { passive: true });
+    window.addEventListener('keydown', resume);
+    window.addEventListener('touchstart', resume, { passive: true });
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
       window.removeEventListener('pointerdown', resume);
       window.removeEventListener('keydown', resume);
+      window.removeEventListener('touchstart', resume);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);

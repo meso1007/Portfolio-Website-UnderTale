@@ -16,7 +16,8 @@ export const getAudioContext = () => {
 // Helper to ensure context is running (needed for Chrome/Edge autoplay policies)
 export const ensureContext = async () => {
   const ctx = getAudioContext();
-  if (ctx && ctx.state === 'suspended') {
+  const state: string = (ctx as any).state;
+  if (ctx && (state === 'suspended' || state === 'interrupted')) {
     await ctx.resume().catch(() => {});
   }
   return ctx;

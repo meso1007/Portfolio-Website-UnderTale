@@ -1,6 +1,6 @@
 import { ensureContext, getAudioContext } from './sound';
 
-export type BgmTrack = 'NEUTRAL' | 'PACIFIST' | 'GENOCIDE' | 'SECRET';
+export type BgmTrack = 'NEUTRAL' | 'PACIFIST' | 'GENOCIDE' | 'SECRET' | 'ENDING';
 
 const STORAGE_KEY = 'undertale_bgm_muted';
 const MASTER_VOLUME = 0.16;
@@ -59,11 +59,23 @@ const TRACKS: Record<BgmTrack, TrackDefinition> = {
       40, null, null, null, 47, null, null, null, 43, null, null, null, 38, null, null, null,
     ],
   },
+  ENDING: {
+    bpm: 72,
+    lead: [
+      76, null, null, null, 79, null, null, null, 81, null, 79, null, 76, null, null, null,
+      74, null, null, null, 76, null, null, null, 72, null, null, null, 74, null, null, null,
+    ],
+    bass: [
+      48, null, null, null, 55, null, null, null, 53, null, null, null, 48, null, null, null,
+      45, null, null, null, 48, null, null, null, 43, null, null, null, 41, null, null, null,
+    ],
+  },
 };
 
 const midiToFrequency = (midi: number): number => 440 * Math.pow(2, (midi - 69) / 12);
 
 let masterGain: GainNode | null = null;
+let masterGainContext: AudioContext | null = null;
 let schedulerId: number | null = null;
 let currentTrack: BgmTrack | null = null;
 let step = 0;
@@ -81,8 +93,9 @@ const loadMuted = (): boolean => {
 muted = loadMuted();
 
 const getMasterGain = (ctx: AudioContext): GainNode => {
-  if (!masterGain) {
+  if (!masterGain || masterGainContext !== ctx) {
     masterGain = ctx.createGain();
+    masterGainContext = ctx;
     masterGain.gain.value = muted ? 0 : MASTER_VOLUME;
     masterGain.connect(ctx.destination);
   }

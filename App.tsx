@@ -38,6 +38,14 @@ const AVATAR_LINES = [
   "Try attacking me. See what happens."
 ];
 
+const FIRST_MEETING_LINES = [
+  "Oh — a visitor. Nice to meet you.",
+  "First time here? Welcome to my little timeline.",
+  "I don't think we've met. I'm Shoya.",
+  "You're new. I can tell.",
+  "Take your time. There is no wrong way to look around."
+];
+
 const AVATAR_HINTS = [
   "There is a hidden order in the menu.",
   "Try SKILLS → HISTORY → CONTACT → PROJECTS.",
@@ -270,6 +278,13 @@ const App: React.FC = () => {
     if (nextCount % 5 === 0) {
       const hint = AVATAR_HINTS[Math.floor(nextCount / 5 - 1) % AVATAR_HINTS.length];
       showAvatarLine(hint, true, 4000);
+      return;
+    }
+
+    // First visit gets a first-meeting line instead of the usual banter.
+    if (visitCount <= 1) {
+      const line = FIRST_MEETING_LINES[Math.floor(Math.random() * FIRST_MEETING_LINES.length)];
+      showAvatarLine(line, false, 3000);
       return;
     }
 

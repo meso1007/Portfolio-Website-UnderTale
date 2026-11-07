@@ -23,6 +23,7 @@ export interface Project {
     def: number; // Maintenance
   };
   link?: string;
+  demo?: string; // Optional live demo URL
   image?: string; // Optional image URL
 }
 

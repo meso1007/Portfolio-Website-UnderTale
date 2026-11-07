@@ -7,17 +7,21 @@ interface BattleButtonProps {
   label: string;
   iconColor: string; // Used for active state styling differentiation
   isActive: boolean;
+  isSelected?: boolean;
   onClick: () => void;
+  onHover?: () => void;
   colorClass?: string; // For the text color when active
 }
 
-export const BattleButton: React.FC<BattleButtonProps> = ({ 
-  label, 
-  isActive, 
+export const BattleButton: React.FC<BattleButtonProps> = ({
+  label,
+  isActive,
+  isSelected = false,
   onClick,
+  onHover,
   colorClass = "text-ut-yellow"
 }) => {
-  
+
   const handleClick = () => {
     playSelect();
     onClick();
@@ -25,12 +29,14 @@ export const BattleButton: React.FC<BattleButtonProps> = ({
 
   const handleMouseEnter = () => {
     playMenuMove();
+    if (onHover) onHover();
   };
 
   return (
     <button
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
+      aria-pressed={isActive}
       className={`
         group
         flex items-center justify-center 
@@ -38,7 +44,8 @@ export const BattleButton: React.FC<BattleButtonProps> = ({
         px-1 py-3 md:px-4 md:py-4
         w-full
         transition-all duration-75
-        ${isActive ? 'bg-ut-gray/20' : 'hover:bg-ut-gray/10'}
+        outline-none
+        ${isSelected ? 'bg-ut-gray/20' : 'hover:bg-ut-gray/10'}
       `}
     >
       {/* 
@@ -53,7 +60,7 @@ export const BattleButton: React.FC<BattleButtonProps> = ({
         <div className={`
           flex items-center justify-center overflow-hidden
           transition-all duration-200 ease-out
-          ${isActive ? 'w-4 mr-2 opacity-100' : 'w-0 mr-0 opacity-0'}
+          ${isSelected ? 'w-4 mr-2 opacity-100' : 'w-0 mr-0 opacity-0'}
         `}>
           <SoulHeart className="w-3 h-3 md:w-4 md:h-4 animate-pulse" />
         </div>
@@ -62,7 +69,7 @@ export const BattleButton: React.FC<BattleButtonProps> = ({
         <span className={`
           font-8bit uppercase tracking-widest truncate
           text-[10px] sm:text-xs md:text-sm
-          ${isActive ? colorClass : 'text-ut-yellow'}
+          ${isActive || isSelected ? colorClass : 'text-ut-yellow'}
         `}>
           {label}
         </span>

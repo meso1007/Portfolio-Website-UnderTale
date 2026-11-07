@@ -4,20 +4,24 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ViewState, GameRoute } from './types';
 import { PLAYER_NAME, PLAYER_LV, PLAYER_ROLE, PLAYER_LOCATION, PLAYER_TRAITS, INTRO_TITLE, INTRO_SUBTITLE, INTRO_START_TEXT } from './constants';
 import { BattleButton } from './components/BattleButton';
-import { DialogueBox } from './components/DialogueBox';
 import { FightView } from './views/FightView';
 import { ActView } from './views/ActView';
 import { ItemView } from './views/ItemView';
 import { MercyView } from './views/MercyView';
 import { SecretView } from './views/SecretView';
+import { Ending } from './components/Ending';
 import pixelUser from './assets/pixel-user.png';
 import { Typewriter } from './components/Typewriter';
-import { playCancel, playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch } from './utils/sound';
+import { playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch, playConfirm } from './utils/sound';
 import { SoulHeart } from './components/SoulHeart';
 import { SavePoint } from './components/SavePoint';
+import { BgmTrack, isBgmMuted, startBgm, setBgmTrack, toggleBgmMuted } from './utils/bgm';
+import { isTyping, skipTyping } from './utils/typing';
 
 const MAX_HP = 101;
 const DAMAGE_PER_HIT = 25;
+
+const VIEW_ORDER = [ViewState.FIGHT, ViewState.ACT, ViewState.ITEM, ViewState.MERCY];
 
 const WEB_DEV_PAINS = [
   "MERGE CONFLICT!",
@@ -32,6 +36,14 @@ const WEB_DEV_PAINS = [
   "UNDEFINED IS NOT A FUNCTION!"
 ];
 
+type EndingType = 'PACIFIST' | 'GENOCIDE';
+
+const bgmTrackFor = (route: GameRoute): BgmTrack => {
+  if (route === GameRoute.PACIFIST) return 'PACIFIST';
+  if (route === GameRoute.GENOCIDE) return 'GENOCIDE';
+  return 'NEUTRAL';
+};
+
 const App: React.FC = () => {
   const [visitCount, setVisitCount] = useState<number>(0);
   const [city, setCity] = useState<string | null>(null);
@@ -44,12 +56,21 @@ const App: React.FC = () => {
   const [currentHpValue, setCurrentHpValue] = useState<number>(MAX_HP);
   const [showSpeechBubble, setShowSpeechBubble] = useState<boolean>(true);
 
+  // Keyboard cursor (2x2 menu, row-major)
+  const [cursor, setCursor] = useState<number>(0);
+  const [transitioning, setTransitioning] = useState<boolean>(false);
+  const [ending, setEnding] = useState<EndingType | null>(null);
+  const [bgmMuted, setBgmMutedState] = useState<boolean>(isBgmMuted());
+  const [blockedMessage, setBlockedMessage] = useState<string | null>(null);
+  const [routeFlash, setRouteFlash] = useState<boolean>(false);
+
   // Secret route sequence tracking
   const [buttonSequence, setButtonSequence] = useState<ViewState[]>([]);
   const [secretUnlocked, setSecretUnlocked] = useState<boolean>(false);
 
   // Ref to prevent double-counting in React Strict Mode
   const hasIncrementedRef = useRef(false);
+  const transitionTimeoutRef = useRef<number | null>(null);
 
   // Load visit count and city from localStorage, and fetch city if not found
   useEffect(() => {
@@ -88,7 +109,7 @@ const App: React.FC = () => {
     setAvatarUrl(`https://api.dicebear.com/9.x/pixel-art/svg?seed=${PLAYER_NAME}`);
   }, []);
 
-  // Auto-hide speech bubble after 5 seconds
+  // Auto-hide speech bubble after 10 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSpeechBubble(false);
@@ -111,23 +132,46 @@ const App: React.FC = () => {
   // Avatar source - always use user's image
   const avatarSrc = pixelUser;
 
-  // Speech bubble for visit count
-  const renderSpeechBubble = (
-    <div className="absolute -top-24 left-1/2 -translate-x-1/2 bg-black border border-white px-3 py-1 rounded-md text-xs whitespace-nowrap">
-      {getVisitMessage(visitCount)}
-    </div>
-  );
-
   // Route State
   const [gameRoute, setGameRoute] = useState<GameRoute>(GameRoute.NEUTRAL);
   const isGenocide = gameRoute === GameRoute.GENOCIDE;
   const isPacifist = gameRoute === GameRoute.PACIFIST;
 
+  // Drive the BGM from the current route.
+  useEffect(() => {
+    if (!hasStarted) return;
+    void startBgm(bgmTrackFor(gameRoute));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasStarted]);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+    setBgmTrack(bgmTrackFor(gameRoute));
+    if (gameRoute === GameRoute.GENOCIDE) {
+      setRouteFlash(true);
+      const timer = window.setTimeout(() => setRouteFlash(false), 600);
+      return () => window.clearTimeout(timer);
+    }
+  }, [gameRoute, hasStarted]);
+
+  const transitionTo = (target: ViewState, glitch = false) => {
+    if (transitioning) return;
+    if (glitch) {
+      playGlitch();
+    } else {
+      playConfirm();
+    }
+    setTransitioning(true);
+    if (transitionTimeoutRef.current) window.clearTimeout(transitionTimeoutRef.current);
+    transitionTimeoutRef.current = window.setTimeout(() => {
+      setView(target);
+      setTransitioning(false);
+    }, 220);
+  };
+
   const handleStart = async () => {
-    // Resume audio context on first user interaction
     await ensureContext();
     setHasStarted(true);
-    // Trigger the encounter sound sequence (Alert + Swoosh)
     playEncounterSequence();
   };
 
@@ -147,8 +191,7 @@ const App: React.FC = () => {
 
   const handleHomeClick = () => {
     if (view !== ViewState.INTRO) {
-      playCancel();
-      setView(ViewState.INTRO);
+      transitionTo(ViewState.INTRO);
     }
   };
 
@@ -172,6 +215,7 @@ const App: React.FC = () => {
         playGlitch();
         setShowControls(true); // Keep controls shown in Genocide
         setView(ViewState.INTRO);
+        setEnding('GENOCIDE');
       }, 1000);
     }
 
@@ -181,24 +225,43 @@ const App: React.FC = () => {
     }, 1200);
   };
 
-  const handleRetry = () => {
+  const handleReturnTitle = () => {
     playSave();
+    setEnding(null);
     setGameRoute(GameRoute.NEUTRAL);
     setCurrentHpValue(MAX_HP);
     setView(ViewState.INTRO);
-    playEncounterSequence();
+    setSecretUnlocked(false);
+    setButtonSequence([]);
+    setTransitioning(false);
     setShowControls(false);
+    setCursor(0);
+    setBlockedMessage(null);
   };
 
   const handlePacifistTrigger = () => {
     setGameRoute(GameRoute.PACIFIST);
+    setEnding('PACIFIST');
+  };
+
+  const handleToggleBgm = () => {
+    const nextMuted = toggleBgmMuted();
+    setBgmMutedState(nextMuted);
+    if (hasStarted) {
+      void startBgm(bgmTrackFor(gameRoute));
+    }
   };
 
   // Handle view change with sequence tracking
   const handleViewChange = (newView: ViewState) => {
+    if (transitioning || ending) return;
+
+    // Already on this section
+    if (newView === view && newView !== ViewState.SECRET) return;
+
     // Don't track if already unlocked or if it's the secret view
     if (secretUnlocked || newView === ViewState.SECRET) {
-      setView(newView);
+      transitionTo(newView);
       return;
     }
 
@@ -215,16 +278,115 @@ const App: React.FC = () => {
       lastFour[1] === correctSequence[1] &&
       lastFour[2] === correctSequence[2] &&
       lastFour[3] === correctSequence[3]) {
+      if (isGenocide) {
+        setBlockedMessage('* NO ONE LEFT.');
+        window.setTimeout(() => setBlockedMessage(null), 2400);
+        return;
+      }
       // Secret unlocked!
       setSecretUnlocked(true);
-      setView(ViewState.SECRET);
-      playGlitch(); // Play special sound
+      transitionTo(ViewState.SECRET, true);
       return;
     }
 
     // Normal view change
-    setView(newView);
+    transitionTo(newView);
   };
+
+  // Keyboard controls
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+
+      if (key === 'm') {
+        event.preventDefault();
+        handleToggleBgm();
+        return;
+      }
+
+      if (ending) return;
+
+      if (isTyping() && (key === 'enter' || key === 'z' || key === ' ' || key === 'x' || key === 'escape')) {
+        event.preventDefault();
+        if (key === 'x' || key === 'escape') {
+          skipTyping();
+          return;
+        }
+        skipTyping();
+        return;
+      }
+
+      if (transitioning) return;
+
+      if (!hasStarted) {
+        if (key === 'enter' || key === 'z' || key === ' ') {
+          event.preventDefault();
+          void handleStart();
+        }
+        return;
+      }
+
+      if (key === 'arrowleft' || key === 'a') {
+        event.preventDefault();
+        if (cursor % 2 === 1) {
+          setCursor(cursor - 1);
+          playMenuMove();
+        }
+        return;
+      }
+
+      if (key === 'arrowright' || key === 'd') {
+        event.preventDefault();
+        if (cursor % 2 === 0) {
+          setCursor(cursor + 1);
+          playMenuMove();
+        }
+        return;
+      }
+
+      if (key === 'arrowup' || key === 'w') {
+        event.preventDefault();
+        if (cursor >= 2) {
+          setCursor(cursor - 2);
+          playMenuMove();
+        }
+        return;
+      }
+
+      if (key === 'arrowdown' || key === 's') {
+        event.preventDefault();
+        if (cursor < 2) {
+          setCursor(cursor + 2);
+          playMenuMove();
+        }
+        return;
+      }
+
+      if (key === 'enter' || key === 'z' || key === ' ') {
+        event.preventDefault();
+        const targetView = VIEW_ORDER[cursor];
+        if (targetView !== view) {
+          handleViewChange(targetView);
+        }
+        return;
+      }
+
+      if (key === 'x' || key === 'escape') {
+        event.preventDefault();
+        handleHomeClick();
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cursor, ending, transitioning, hasStarted, view, gameRoute, buttonSequence, secretUnlocked]);
 
   const renderContent = () => {
     switch (view) {
@@ -351,8 +513,7 @@ const App: React.FC = () => {
                 <Typewriter
                   text={isGenocide
                     ? "* (The developer turned to dust.)"
-                    : (isPacifist ? "* The developer is happy!" : "* You encountered a wild developer!")
-                  }
+                    : (isPacifist ? "* The developer is happy!" : "* You encountered a wild developer!")}
                   speed={40}
                   className={`font-pixel ${isGenocide ? 'text-ut-red' : 'text-ut-gray'}`}
                   enableSound={true}
@@ -366,7 +527,7 @@ const App: React.FC = () => {
       case ViewState.ACT:
         return <ActView route={gameRoute} />;
       case ViewState.ITEM:
-        return <ItemView />;
+        return <ItemView route={gameRoute} />;
       case ViewState.MERCY:
         return <MercyView route={gameRoute} onPacifistTrigger={handlePacifistTrigger} />;
       case ViewState.SECRET:
@@ -401,6 +562,9 @@ const App: React.FC = () => {
               {INTRO_START_TEXT}
             </p>
           </div>
+          <p className="font-pixel text-[10px] text-gray-600 mt-6">
+            Z / ENTER to start · M to toggle BGM
+          </p>
         </div>
       </div>
     );
@@ -413,6 +577,15 @@ const App: React.FC = () => {
 
       {/* Save Point (Guestbook) */}
       <SavePoint />
+
+      {/* BGM toggle */}
+      <button
+        onClick={handleToggleBgm}
+        className={`fixed bottom-4 left-6 z-40 font-pixel text-xs hover:text-ut-yellow transition-colors ${isGenocide ? 'text-ut-red' : 'text-gray-500'}`}
+        title="Toggle BGM (M)"
+      >
+        ♪ BGM: {bgmMuted ? 'OFF' : 'ON'}
+      </button>
 
       {/* Main Container */}
       <div className="w-full max-w-4xl flex flex-col gap-6 relative z-10">
@@ -452,7 +625,10 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Display Area */}
-        <div className={`relative w-full border-4 ${isGenocide ? 'border-ut-red animate-pulse' : 'border-white'} min-h-[300px] md:min-h-[400px] p-6 bg-black overflow-hidden`}>
+        <div
+          className={`relative w-full border-4 ${isGenocide ? 'border-ut-red animate-pulse' : 'border-white'} min-h-[300px] md:min-h-[400px] p-6 bg-black overflow-hidden`}
+          onClick={() => { if (isTyping()) skipTyping(); }}
+        >
           {(view !== ViewState.INTRO) && (
             <div className={`absolute top-0 left-0 ${isGenocide ? 'bg-ut-red text-black' : 'bg-white text-black'} px-2 py-1 font-8bit text-xs`}>
               MODE: {isGenocide ? 'EXECUTION' : view}
@@ -469,6 +645,8 @@ const App: React.FC = () => {
             label={isGenocide ? "VICTIMS" : "PROJECTS"}
             iconColor="text-ut-red"
             isActive={view === ViewState.FIGHT}
+            isSelected={cursor === 0}
+            onHover={() => setCursor(0)}
             onClick={() => handleViewChange(ViewState.FIGHT)}
             colorClass="text-ut-red"
           />
@@ -476,6 +654,8 @@ const App: React.FC = () => {
             label={isGenocide ? "EXP" : "SKILLS"}
             iconColor="text-blue-400"
             isActive={view === ViewState.ACT}
+            isSelected={cursor === 1}
+            onHover={() => setCursor(1)}
             onClick={() => handleViewChange(ViewState.ACT)}
             colorClass="text-blue-400"
           />
@@ -483,6 +663,8 @@ const App: React.FC = () => {
             label={isGenocide ? "LV" : "HISTORY"}
             iconColor="text-orange-400"
             isActive={view === ViewState.ITEM}
+            isSelected={cursor === 2}
+            onHover={() => setCursor(2)}
             onClick={() => handleViewChange(ViewState.ITEM)}
             colorClass="text-orange-400"
           />
@@ -490,6 +672,8 @@ const App: React.FC = () => {
             label={isGenocide ? "NOBODY" : "CONTACT"}
             iconColor="text-ut-yellow"
             isActive={view === ViewState.MERCY}
+            isSelected={cursor === 3}
+            onHover={() => setCursor(3)}
             onClick={() => handleViewChange(ViewState.MERCY)}
             colorClass="text-ut-yellow"
           />
@@ -501,7 +685,7 @@ const App: React.FC = () => {
             <p className={`font-pixel text-sm animate-pulse ${isGenocide ? 'text-ut-red' : 'text-gray-500'}`}>
               {isGenocide
                 ? "* (Nothing left to see here.)"
-                : "* (Click Name to Reset | Look for the Star to Save)"
+                : "* ARROWS: MOVE | Z: OK | X: BACK | M: BGM"
               }
             </p>
           </div>
@@ -517,6 +701,22 @@ const App: React.FC = () => {
         </div>
 
       </div>
+
+      {/* Blocked secret message */}
+      {blockedMessage && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[95] bg-black border-2 border-ut-red text-ut-red font-pixel text-sm px-4 py-2">
+          {blockedMessage}
+        </div>
+      )}
+
+      {/* Route change flash */}
+      {routeFlash && <div className="fixed inset-0 z-[90] pointer-events-none bg-ut-red/10 animate-pulse" />}
+
+      {/* Transition curtain */}
+      <div className={`fixed inset-0 bg-black z-[98] pointer-events-none transition-opacity duration-200 ${transitioning ? 'opacity-100' : 'opacity-0'}`} />
+
+      {/* Ending */}
+      {ending && <Ending type={ending} onReturnTitle={handleReturnTitle} />}
     </div>
   );
 };

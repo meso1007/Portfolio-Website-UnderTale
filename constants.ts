@@ -9,6 +9,7 @@ export const PROJECTS: Project[] = [
     tech: ['Go', 'CLI', 'Git', 'GoReleaser', 'Homebrew', 'Scoop'],
     stats: { atk: 20, def: 90 },
     link: 'https://github.com/meso1007/Tagoly',
+    demo: 'https://www.tagoly-lp.us/',
     image: 'https://raw.githubusercontent.com/meso1007/Tagoly/main/assets/readme/demo-crop.gif',
   },
   {
@@ -17,7 +18,8 @@ export const PROJECTS: Project[] = [
     description: 'Turns heartfelt messages into QR-coded letters you can keep. Built for simple writing and calm reading. (Japanese)',
     tech: ['Next.js', 'TypeScript', 'TailwindCSS', 'Framer Motion'],
     stats: { atk: 30, def: 80 },
-    link: 'https://next-qrcode-message-web-app.vercel.app',
+    link: 'https://github.com/meso1007/NEXT-QRcodeMessage-WebApp',
+    demo: 'https://next-qrcode-message-web-app.vercel.app',
     image: 'https://raw.githubusercontent.com/meso1007/NEXT-QRcodeMessage-WebApp/main/public/readme/topPage.png',
   },
   {
@@ -26,7 +28,8 @@ export const PROJECTS: Project[] = [
     description: 'An AI that reverse-engineers your goal into a learning roadmap, then quizzes you at every step.',
     tech: ['Next.js', 'TypeScript', 'Go', 'Echo', 'PostgreSQL', 'Supabase', 'Gemini API', 'Docker'],
     stats: { atk: 85, def: 70 },
-    link: 'https://cartes-three.vercel.app',
+    link: 'https://github.com/meso1007/logic-latch',
+    demo: 'https://cartes-three.vercel.app',
     image: 'https://raw.githubusercontent.com/meso1007/logic-latch/main/frontend/public/logo.png',
   },
   {

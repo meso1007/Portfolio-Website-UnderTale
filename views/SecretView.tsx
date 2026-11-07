@@ -1,12 +1,26 @@
 import React from 'react';
 import { Typewriter } from '../components/Typewriter';
+import { GameRoute } from '../types';
 
 interface SecretViewProps {
-    route: string;
+    route: GameRoute;
 }
 
 export const SecretView: React.FC<SecretViewProps> = ({ route }) => {
-    const isGenocide = route === 'GENOCIDE';
+    const isGenocide = route === GameRoute.GENOCIDE;
+
+    if (isGenocide) {
+        return (
+            <div className="h-full flex flex-col items-center justify-center text-center">
+                <div className="animate-glitch text-ut-red font-pixel text-2xl md:text-3xl mb-6">
+                    * NO ONE LEFT.
+                </div>
+                <p className="font-pixel text-ut-red/70 text-sm">
+                    * The secret route has been erased.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 animate-fadeIn">
@@ -79,7 +93,7 @@ export const SecretView: React.FC<SecretViewProps> = ({ route }) => {
                     <TechBadge name="Tailwind CSS" />
                     <TechBadge name="Vite" />
                     <TechBadge name="Go" />
-                    <TechBadge name="Notion API" />
+                    <TechBadge name="Vercel" />
                 </div>
             </div>
 

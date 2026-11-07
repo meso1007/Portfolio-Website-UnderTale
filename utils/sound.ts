@@ -3,7 +3,7 @@
 // Web Audio API Context
 let audioContext: AudioContext | null = null;
 
-const getAudioContext = () => {
+export const getAudioContext = () => {
   if (!audioContext) {
     // Cross-browser compatibility
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;

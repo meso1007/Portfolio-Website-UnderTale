@@ -20,7 +20,6 @@ export const MercyView: React.FC<MercyViewProps> = ({ route, onPacifistTrigger }
     if (isGenocide) return;
     playHeal();
     setSpared(true);
-    onPacifistTrigger();
   };
 
   if (isGenocide) {
@@ -56,14 +55,23 @@ export const MercyView: React.FC<MercyViewProps> = ({ route, onPacifistTrigger }
           (They look ready to join your party / company.)
         </p>
 
-        <a
-          href="mailto:diegoshoya2017@gmail.com"
-          className="font-8bit border-4 border-yellow-400 px-6 py-3 bg-black text-yellow-400 hover:bg-yellow-400 hover:text-black transition-colors animate-pulse"
-          onMouseEnter={() => playMenuMove()}
-          onClick={() => playHeal()}
-        >
-          SEND OFFER LETTER
-        </a>
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+          <a
+            href="mailto:diegoshoya2017@gmail.com"
+            className="font-8bit border-4 border-yellow-400 px-6 py-3 bg-black text-yellow-400 hover:bg-yellow-400 hover:text-black transition-colors animate-pulse"
+            onMouseEnter={() => playMenuMove()}
+            onClick={() => playHeal()}
+          >
+            SEND OFFER LETTER
+          </a>
+          <button
+            onClick={() => { playConfirm(); onPacifistTrigger(); }}
+            onMouseEnter={() => playMenuMove()}
+            className="font-8bit border-4 border-white px-6 py-3 bg-black text-white hover:bg-white hover:text-black transition-colors"
+          >
+            CONTINUE
+          </button>
+        </div>
       </div>
     );
   }

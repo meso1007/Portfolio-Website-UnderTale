@@ -458,8 +458,8 @@ const App: React.FC = () => {
                   )}
 
                   {/* Name Tag */}
-                  <div className={`absolute -bottom-5 left-1/2 -translate-x-1/2 bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-2 md:px-3 py-1 z-10 max-w-[200px] md:max-w-[260px] text-center`}>
-                    <span className={`font-8bit text-[9px] md:text-xs leading-tight break-words ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
+                  <div className={`absolute -bottom-5 left-1/2 -translate-x-1/2 bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-2 md:px-3 py-1 z-10 whitespace-nowrap`}>
+                    <span className={`font-8bit text-[9px] md:text-xs leading-tight ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
                       {isGenocide ? 'ENEMY' : PLAYER_ROLE}
                     </span>
                   </div>

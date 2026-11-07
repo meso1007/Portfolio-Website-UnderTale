@@ -124,7 +124,7 @@ export const HISTORY: Experience[] = [
 ];
 
 export const PLAYER_NAME = "SHOYA";
-export const PLAYER_ROLE = "FULL-STACK ENGINEER";
+export const PLAYER_ROLE = "FULL-STACK DEV";
 export const PLAYER_LOCATION = "FUJISAWA, JAPAN";
 // LV is the player's age, derived from the birthday so it updates automatically.
 const BIRTHDAY = new Date(2002, 9, 7); // 2002-10-07

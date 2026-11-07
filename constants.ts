@@ -106,7 +106,7 @@ export const HISTORY: Experience[] = [
   {
     role: 'FULL-STACK ENGINEER',
     company: '??????',
-    year: '2026 APR',
+    year: '2026 - PRESENT',
     description: 'Ships features end to end: Java / Spring Boot APIs, Vue.js UI, Kubernetes and CI/CD.',
   },
   {

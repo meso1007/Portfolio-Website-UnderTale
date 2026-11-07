@@ -47,6 +47,16 @@ const AVATAR_HINTS = [
 
 const CRITICAL_LINE = "Please... don't. I'll write the tests. I'll fix the bugs. I'll do anything.";
 
+const RESET_LINES = [
+  "Back to the beginning. Again.",
+  "You came back. I knew you would.",
+  "How many times are you going to defeat me?",
+  "Again? Do you have nothing better to do?",
+  "I've lost count. Have you?"
+];
+
+const RESET_COUNT_KEY = 'undertale_reset_count';
+
 const WEB_DEV_PAINS = [
   "MERGE CONFLICT!",
   "PROD DB DELETED!",
@@ -305,6 +315,20 @@ const App: React.FC = () => {
 
   const handleReturnTitle = () => {
     playSave();
+
+    // Count resets for this browser session and answer accordingly.
+    const storedResets = typeof sessionStorage !== 'undefined'
+      ? Number(sessionStorage.getItem(RESET_COUNT_KEY) ?? '0')
+      : 0;
+    const nextResetCount = Number.isFinite(storedResets) ? storedResets + 1 : 1;
+    try {
+      sessionStorage.setItem(RESET_COUNT_KEY, String(nextResetCount));
+    } catch {
+      // ignore storage errors
+    }
+    const lineIndex = Math.min(nextResetCount - 1, RESET_LINES.length - 1);
+    showAvatarLine(RESET_LINES[Math.max(0, lineIndex)], nextResetCount >= 3, 4500);
+
     setEnding(null);
     setGameRoute(GameRoute.NEUTRAL);
     setCurrentHpValue(MAX_HP);

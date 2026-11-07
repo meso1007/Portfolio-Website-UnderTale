@@ -10,17 +10,33 @@ import { unlockAchievement } from '../utils/achievements';
 const API_URL = API_ENDPOINTS.GUESTBOOK;
 
 // Mock Initial Data for fallback
-const INITIAL_ENTRIES: GuestbookEntry[] = [
-  { id: "1", name: "PAPYRUS", message: "NYEH HEH HEH!", date: "202X-01-01" },
-  { id: "2", name: "SANS", message: "cool website. i guess.", date: "202X-01-02" },
+const daysAgo = (days: number): string => {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  return date.toISOString().split('T')[0];
+};
+
+// Seed entries so the guestbook feels alive before real visitors arrive.
+const SEED_ENTRIES: GuestbookEntry[] = [
+  { id: "seed-1", name: "mika_404", message: "the secret room is real. i am not joking.", date: daysAgo(1) },
+  { id: "seed-2", name: "sora.dev", message: "the menu has an order. found it by accident.", date: daysAgo(2) },
+  { id: "seed-3", name: "KENTA", message: "Tagoly is actually useful. nice work.", date: daysAgo(4) },
+  { id: "seed-4", name: "nightowl", message: "chiptune at 2am hits different", date: daysAgo(6) },
+  { id: "seed-5", name: "pixelpanda", message: "ポートフォリオがゲームみたいで楽しい！", date: daysAgo(9) },
 ];
+
+const mergeEntries = (apiEntries: GuestbookEntry[]): GuestbookEntry[] => {
+  const known = new Set(apiEntries.map((entry) => entry.id));
+  const seeds = SEED_ENTRIES.filter((entry) => !known.has(entry.id));
+  return [...seeds, ...apiEntries].sort((a, b) => b.date.localeCompare(a.date));
+};
 
 // Always pinned to the top of the guestbook, regardless of the API response.
 const HOST_MESSAGE = "Thank you for visiting! Try different menu orders.";
 
 export const SavePoint: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [entries, setEntries] = useState<GuestbookEntry[]>(INITIAL_ENTRIES);
+  const [entries, setEntries] = useState<GuestbookEntry[]>(SEED_ENTRIES);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [view, setView] = useState<'MENU' | 'GUESTBOOK'>('MENU');
@@ -36,14 +52,16 @@ export const SavePoint: React.FC = () => {
       const res = await fetch(API_URL);
       if (!res.ok) throw new Error("API Error");
       const data = await res.json();
-      setEntries(data);
+      setEntries(mergeEntries(data));
       setIsOffline(false);
     } catch (e) {
       console.log("Backend not reachable, switching to Offline Mode (LocalStorage).");
       setIsOffline(true);
       const saved = localStorage.getItem('undertale_guestbook');
       if (saved) {
-        setEntries(JSON.parse(saved));
+        setEntries(mergeEntries(JSON.parse(saved)));
+      } else {
+        setEntries(SEED_ENTRIES);
       }
     } finally {
       setIsLoading(false);

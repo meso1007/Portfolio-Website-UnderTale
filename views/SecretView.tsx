@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     MessageSquare, BarChart3, Code2, Sparkles, Trophy,
-    Github, ArrowLeft, CheckCircle2, Terminal, Lock, Unlock, Music
+    Github, ArrowLeft, CheckCircle2, Circle, Terminal,
+    Lock, Unlock, Music, PlayCircle
 } from 'lucide-react';
 import { Typewriter } from '../components/Typewriter';
-import { playConfirm, playGlitch, playMenuMove } from '../utils/sound';
+import { playConfirm, playGlitch, playHeal, playMenuMove } from '../utils/sound';
+import { BgmTrack, setBgmTrack } from '../utils/bgm';
 import { GameRoute } from '../types';
 
 interface SecretViewProps {
@@ -33,11 +35,7 @@ const FACTS = [
     'The Genocide route rewrites the entire interface.',
 ];
 
-const LOG = [
-    'Found the hidden path (SKILLS → HISTORY → CONTACT → PROJECTS)',
-    'Heard the original chiptune',
-    'Read the developer\'s notes',
-];
+const TRACKS: BgmTrack[] = ['NEUTRAL', 'PACIFIST', 'GENOCIDE', 'SECRET'];
 
 const STARS = [
     { left: '6%', top: '8%', size: 14, delay: '0s' },
@@ -55,6 +53,11 @@ const HIDDEN_NOTE = `* The best portfolios are the ones you can play.
 * Thanks for making it all the way here.
 * — Shoya`;
 
+const TERMINAL_INTRO = [
+    'shoya@portfolio:~$ help',
+    'Available: help, whoami, ls, cat <file>, projects, skills, contact, bgm <track>, clear, exit',
+];
+
 const Panel: React.FC<{ icon: React.ReactNode; title: string; children: React.ReactNode }> = ({ icon, title, children }) => (
     <section className="relative border-2 border-ut-yellow/40 bg-gray-950/70 p-5">
         <h3 className="flex items-center gap-3 font-8bit text-sm md:text-base text-ut-yellow mb-4">
@@ -68,6 +71,26 @@ const Panel: React.FC<{ icon: React.ReactNode; title: string; children: React.Re
 export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     const isGenocide = route === GameRoute.GENOCIDE;
     const [decrypted, setDecrypted] = useState(false);
+    const [usedTerminal, setUsedTerminal] = useState(false);
+    const [usedJukebox, setUsedJukebox] = useState(false);
+    const [trueSecretShown, setTrueSecretShown] = useState(false);
+    const [playing, setPlaying] = useState<BgmTrack>('SECRET');
+    const [history, setHistory] = useState<string[]>(TERMINAL_INTRO);
+    const [command, setCommand] = useState('');
+    const terminalRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (terminalRef.current) {
+            terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+        }
+    }, [history]);
+
+    useEffect(() => {
+        if (usedTerminal && usedJukebox && decrypted && !trueSecretShown) {
+            setTrueSecretShown(true);
+            playHeal();
+        }
+    }, [usedTerminal, usedJukebox, decrypted, trueSecretShown]);
 
     if (isGenocide) {
         return (
@@ -82,11 +105,81 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
         );
     }
 
+    const selectTrack = (track: BgmTrack) => {
+        playConfirm();
+        setBgmTrack(track);
+        setPlaying(track);
+        setUsedJukebox(true);
+    };
+
     const handleDecrypt = () => {
         if (decrypted) return;
         playGlitch();
         setDecrypted(true);
     };
+
+    const runCommand = (raw: string) => {
+        const cmd = raw.trim();
+        if (!cmd) return;
+
+        const lower = cmd.toLowerCase();
+        const output: string[] = [`shoya@portfolio:~$ ${cmd}`];
+
+        if (lower === 'help') {
+            output.push('Available: help, whoami, ls, cat <file>, projects, skills, contact, bgm <track>, clear, exit');
+        } else if (lower === 'whoami') {
+            output.push('shoya — full-stack engineer. Currently in a room that does not exist.');
+        } else if (lower === 'ls') {
+            output.push('about.txt   projects.log   secret.key   credits.md');
+        } else if (lower === 'cat about.txt') {
+            output.push('Backend, frontend, infra, DevOps. Bilingual EN/JP. Shipping Tagoly.');
+        } else if (lower === 'cat projects.log') {
+            output.push('Tagoly / OTODOKE LIFE / Cartes / Durian-Map / GAS INSIGHT — see PROJECTS.');
+        } else if (lower === 'cat secret.key') {
+            output.push('The key is not a file. Try the jukebox and the locked file.');
+        } else if (lower === 'cat credits.md') {
+            output.push('Built by Shoya Horiuchi. Inspired by UNDERTALE by Toby Fox.');
+        } else if (lower === 'projects') {
+            output.push('Tagoly, OTODOKE LIFE, Cartes, Durian-Map, GAS INSIGHT');
+        } else if (lower === 'skills') {
+            output.push('Java / Spring Boot, TypeScript, Go, Python, Kubernetes, Jenkins, English');
+        } else if (lower === 'contact') {
+            output.push('diegoshoya2017@gmail.com  ·  github.com/meso1007');
+        } else if (lower.startsWith('bgm')) {
+            const requested = lower.split(/\s+/)[1]?.toUpperCase();
+            if (requested && (TRACKS as string[]).includes(requested)) {
+                selectTrack(requested as BgmTrack);
+                output.push(`Now playing: ${requested}`);
+            } else {
+                output.push('Usage: bgm <neutral|pacifist|genocide|secret>');
+            }
+        } else if (lower === 'clear') {
+            setHistory([]);
+            setCommand('');
+            setUsedTerminal(true);
+            return;
+        } else if (lower === 'exit') {
+            output.push('There is no exit. Only RETURN.');
+        } else if (lower === 'sudo') {
+            output.push('Nice try. You are not the administrator of this timeline.');
+        } else if (lower === 'rm -rf /') {
+            output.push('Not in this timeline.');
+        } else if (lower === 'secret') {
+            output.push('You are standing in it.');
+        } else {
+            output.push(`command not found: ${cmd}. Type \`help\`.`);
+        }
+
+        setHistory((prev) => [...prev, ...output]);
+        setCommand('');
+        setUsedTerminal(true);
+    };
+
+    const objectives = [
+        { done: usedTerminal, label: 'Use the terminal' },
+        { done: usedJukebox, label: 'Play a track on the jukebox' },
+        { done: decrypted, label: 'Decrypt hidden file 02' },
+    ];
 
     return (
         <div className="relative space-y-6 pb-4">
@@ -136,17 +229,35 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
             </div>
 
             {/* Terminal */}
-            <div className="border-2 border-ut-yellow bg-black p-4 font-pixel text-sm">
-                <div className="flex items-center justify-between text-gray-500 text-[10px] mb-3 border-b border-white/10 pb-2">
-                    <span>shoya@portfolio</span>
-                    <span>secret.log</span>
+            <Panel icon={<Terminal size={18} />} title="TERMINAL">
+                <div
+                    ref={terminalRef}
+                    className="h-48 overflow-y-auto custom-scrollbar bg-black border border-white/10 p-3 font-pixel text-xs md:text-sm leading-relaxed"
+                >
+                    {history.map((line, index) => (
+                        <p key={index} className={line.startsWith('shoya@') ? 'text-ut-yellow' : 'text-gray-300'}>
+                            {line}
+                        </p>
+                    ))}
                 </div>
-                <p className="text-ut-yellow">$ cat secret.log</p>
-                <p className="text-white">ACCESS GRANTED.</p>
-                <p className="text-white">ROUTE: SECRET</p>
-                <p className="text-gray-400">Loading the part of me that isn't on the resume...</p>
-                <p className="text-ut-yellow mt-1 animate-pulse">_</p>
-            </div>
+                <form
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        runCommand(command);
+                    }}
+                    className="flex items-center gap-2 mt-3 font-pixel text-sm"
+                >
+                    <span className="text-ut-yellow shrink-0">shoya@portfolio:~$</span>
+                    <input
+                        value={command}
+                        onChange={(event) => setCommand(event.target.value)}
+                        placeholder="type a command..."
+                        autoComplete="off"
+                        spellCheck={false}
+                        className="flex-1 bg-transparent text-white placeholder-gray-600 outline-none border-b border-white/20 focus:border-ut-yellow py-1"
+                    />
+                </form>
+            </Panel>
 
             {/* Developer message */}
             <Panel icon={<MessageSquare size={18} />} title="DEVELOPER'S MESSAGE">
@@ -198,6 +309,29 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                 </Panel>
             </div>
 
+            {/* Jukebox */}
+            <Panel icon={<Music size={18} />} title="JUKEBOX">
+                <div className="grid grid-cols-2 gap-2">
+                    {TRACKS.map((track) => (
+                        <button
+                            key={track}
+                            onClick={() => selectTrack(track)}
+                            onMouseEnter={() => playMenuMove()}
+                            className={`flex items-center justify-center gap-2 font-8bit text-[10px] px-3 py-3 border transition-colors ${playing === track
+                                ? 'bg-ut-yellow text-black border-ut-yellow'
+                                : 'bg-black text-ut-yellow border-ut-yellow/50 hover:bg-ut-yellow/10'
+                                }`}
+                        >
+                            <PlayCircle size={12} />
+                            {track}
+                        </button>
+                    ))}
+                </div>
+                <p className="font-pixel text-xs text-gray-500 mt-3">
+                    * Leaving this room restores the track for the current route.
+                </p>
+            </Panel>
+
             {/* Fun facts */}
             <Panel icon={<Sparkles size={18} />} title="FUN FACTS">
                 <ul className="space-y-2 font-pixel text-white text-sm">
@@ -205,18 +339,6 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                         <li key={fact} className="flex gap-2">
                             <span className="text-ut-yellow">*</span>
                             <span>{fact}</span>
-                        </li>
-                    ))}
-                </ul>
-            </Panel>
-
-            {/* Secret log */}
-            <Panel icon={<Trophy size={18} />} title="SECRET LOG">
-                <ul className="space-y-2 font-pixel text-white text-sm">
-                    {LOG.map((entry) => (
-                        <li key={entry} className="flex items-start gap-2">
-                            <CheckCircle2 size={14} className="mt-0.5 text-green-400 shrink-0" />
-                            <span>{entry}</span>
                         </li>
                     ))}
                 </ul>
@@ -247,6 +369,38 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                     </div>
                 )}
             </section>
+
+            {/* Objectives */}
+            <Panel icon={<Trophy size={18} />} title="ROOM OBJECTIVES">
+                <ul className="space-y-2 font-pixel text-white text-sm">
+                    {objectives.map((objective) => (
+                        <li key={objective.label} className="flex items-start gap-2">
+                            {objective.done ? (
+                                <CheckCircle2 size={14} className="mt-0.5 text-green-400 shrink-0" />
+                            ) : (
+                                <Circle size={14} className="mt-0.5 text-gray-600 shrink-0" />
+                            )}
+                            <span className={objective.done ? 'text-green-300' : 'text-gray-400'}>
+                                {objective.label}
+                            </span>
+                        </li>
+                    ))}
+                </ul>
+            </Panel>
+
+            {/* True secret */}
+            {trueSecretShown && (
+                <section className="relative border-4 border-ut-yellow bg-yellow-400/10 p-6 text-center animate-pulse">
+                    <h3 className="font-8bit text-sm md:text-lg text-ut-yellow mb-3">
+                        ✦ TRUE SECRET UNLOCKED ✦
+                    </h3>
+                    <div className="space-y-2 font-pixel text-yellow-100 text-sm">
+                        <p>* You did everything in the room.</p>
+                        <p>* The real secret was the time you spent here.</p>
+                        <p>* Now go build something. — Shoya</p>
+                    </div>
+                </section>
+            )}
 
             {/* Footer actions */}
             <div className="relative flex flex-col md:flex-row items-center justify-center gap-4 pt-2">

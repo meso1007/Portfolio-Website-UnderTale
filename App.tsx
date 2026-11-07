@@ -413,7 +413,7 @@ const App: React.FC = () => {
           <div className={`flex flex-col h-full justify-center transition-all duration-100 ${isAttacked ? 'animate-shake' : ''}`}>
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 mb-6 overflow-visible">
               {/* Avatar Column */}
-              <div className="flex flex-col items-center gap-6 shrink-0 mx-auto md:mx-0 overflow-visible">
+              <div className="flex flex-col items-center gap-8 shrink-0 mx-auto md:mx-0 overflow-visible">
                 <div className="relative group overflow-visible">
                   <div
                     className={`w-40 h-40 md:w-52 md:h-52 relative border-4 ${isGenocide ? 'border-ut-red' : 'border-white'} bg-black p-2 transition-all duration-75`}
@@ -458,7 +458,7 @@ const App: React.FC = () => {
                   )}
 
                   {/* Name Tag */}
-                  <div className={`absolute -bottom-5 left-1/2 -translate-x-1/2 bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-2 md:px-3 py-1 z-10 whitespace-nowrap`}>
+                  <div className={`absolute -bottom-9 left-1/2 -translate-x-1/2 bg-black border-2 ${isGenocide ? 'border-ut-red' : 'border-white'} px-2 md:px-3 py-1 z-10 whitespace-nowrap`}>
                     <span className={`font-8bit text-[9px] md:text-xs leading-tight ${isGenocide ? 'text-ut-red' : 'text-ut-yellow'} uppercase`}>
                       {isGenocide ? 'ENEMY' : PLAYER_ROLE}
                     </span>

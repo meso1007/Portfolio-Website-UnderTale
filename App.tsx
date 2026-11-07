@@ -513,8 +513,18 @@ const App: React.FC = () => {
 
                   {/* Important hint marker */}
                   {avatarImportant && !isGenocide && (
-                    <div className="absolute -top-4 -right-4 z-30 font-8bit text-3xl text-ut-yellow animate-bounce drop-shadow-[0_0_10px_rgba(250,204,21,0.9)]">
-                      !
+                    <div className="absolute -top-5 -right-5 z-[70] pointer-events-none animate-bounce">
+                      <div
+                        className="w-16 h-16 bg-black p-[3px] drop-shadow-[0_0_14px_rgba(250,204,21,0.95)]"
+                        style={{ clipPath: 'polygon(50% 0%, 62% 18%, 80% 8%, 81% 28%, 100% 28%, 88% 44%, 100% 60%, 81% 60%, 82% 82%, 64% 72%, 50% 92%, 36% 72%, 18% 82%, 19% 60%, 0% 60%, 12% 44%, 0% 28%, 19% 28%, 20% 8%, 38% 18%)' }}
+                      >
+                        <div
+                          className="w-full h-full bg-ut-yellow text-black flex items-center justify-center"
+                          style={{ clipPath: 'polygon(50% 0%, 62% 18%, 80% 8%, 81% 28%, 100% 28%, 88% 44%, 100% 60%, 81% 60%, 82% 82%, 64% 72%, 50% 92%, 36% 72%, 18% 82%, 19% 60%, 0% 60%, 12% 44%, 0% 28%, 19% 28%, 20% 8%, 38% 18%)' }}
+                        >
+                          <span className="font-8bit text-2xl leading-none">!</span>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -717,13 +727,11 @@ const App: React.FC = () => {
                   className={`absolute top-0 left-0 h-full ${isGenocide ? 'bg-black' : 'bg-ut-yellow'} transition-all duration-300`}
                   style={{ width: `${Math.max(0, (currentHpValue / MAX_HP) * 100)}%` }}
                 ></div>
-                <div className="z-10 text-[10px] text-white mix-blend-difference w-full text-center font-bold leading-none">
-                  {Math.max(0, currentHpValue)} / {MAX_HP}
+                <div className={`z-10 text-[10px] text-white mix-blend-difference w-full text-center font-bold leading-none ${isCritical ? 'animate-pulse' : ''}`}>
+                  {isCritical ? 'CRITICAL' : `${Math.max(0, currentHpValue)} / ${MAX_HP}`}
                 </div>
               </div>
-              {isCritical && (
-                <span className="font-8bit text-[10px] text-ut-red animate-pulse">CRITICAL</span>
-              )}
+
             </div>
           </div>
         </div>

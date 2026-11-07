@@ -26,8 +26,8 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
   {
     id: 'guestbook',
-    title: 'SAVE POINT',
-    description: 'Signed the guestbook.',
+    title: 'SEND FEEDBACK',
+    description: 'Left a message in the guestbook.',
     hint: 'Find the star at the bottom right.',
   },
   {

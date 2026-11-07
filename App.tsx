@@ -513,7 +513,7 @@ const App: React.FC = () => {
 
                   {/* Important hint marker */}
                   {avatarImportant && !isGenocide && (
-                    <div className="absolute top-2 -right-4 z-[70] pointer-events-none animate-bounce">
+                    <div className="absolute top-2 right-0 z-[70] pointer-events-none animate-bounce">
                       <div className="relative">
                         <div className="w-10 h-10 rounded-full bg-ut-yellow border-2 border-black flex items-center justify-center shadow-[0_0_12px_rgba(250,204,21,0.8)]">
                           <span className="font-8bit text-lg leading-none text-black">!</span>

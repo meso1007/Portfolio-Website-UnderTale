@@ -16,7 +16,7 @@ const INITIAL_ENTRIES: GuestbookEntry[] = [
 ];
 
 // Always pinned to the top of the guestbook, regardless of the API response.
-const HOST_MESSAGE = "Thank you for visiting! I read every message here. If you want to see the rest of the site: SKILLS → HISTORY → CONTACT → PROJECTS.";
+const HOST_MESSAGE = "Thank you for visiting! Try different menu orders.";
 
 export const SavePoint: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);

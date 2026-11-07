@@ -13,7 +13,7 @@ import { SecretView } from './views/SecretView';
 import { Ending } from './components/Ending';
 import pixelUser from './assets/pixel-user.png';
 import { Typewriter } from './components/Typewriter';
-import { playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch, playConfirm, playSelect } from './utils/sound';
+import { playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch, playConfirm, playSelect, playHeartbeat } from './utils/sound';
 import { SoulHeart } from './components/SoulHeart';
 import { SavePoint } from './components/SavePoint';
 import { BgmTrack, isBgmMuted, startBgm, setBgmTrack, toggleBgmMuted } from './utils/bgm';
@@ -36,6 +36,16 @@ const AVATAR_LINES = [
   "If you're hiring, my inbox is open.",
   "Try attacking me. See what happens."
 ];
+
+const AVATAR_HINTS = [
+  "There is a hidden order in the menu.",
+  "Try SKILLS → HISTORY → CONTACT → PROJECTS.",
+  "Attack me five times. I dare you.",
+  "This portfolio has a secret track.",
+  "The path you are looking for is already written."
+];
+
+const CRITICAL_LINE = "You're on your last legs. One more hit ends this timeline.";
 
 const WEB_DEV_PAINS = [
   "MERGE CONFLICT!",
@@ -70,6 +80,8 @@ const App: React.FC = () => {
   const [currentHpValue, setCurrentHpValue] = useState<number>(MAX_HP);
   const [showSpeechBubble, setShowSpeechBubble] = useState<boolean>(true);
   const [avatarMessage, setAvatarMessage] = useState<string | null>(null);
+  const [avatarImportant, setAvatarImportant] = useState<boolean>(false);
+  const [avatarClickCount, setAvatarClickCount] = useState<number>(0);
 
   // Keyboard cursor (2x2 menu, row-major)
   const [cursor, setCursor] = useState<number>(0);
@@ -153,6 +165,7 @@ const App: React.FC = () => {
   const [gameRoute, setGameRoute] = useState<GameRoute>(GameRoute.NEUTRAL);
   const isGenocide = gameRoute === GameRoute.GENOCIDE;
   const isPacifist = gameRoute === GameRoute.PACIFIST;
+  const isCritical = currentHpValue === 1 && !isGenocide;
 
   // Drive the BGM from the current route.
   useEffect(() => {
@@ -210,18 +223,35 @@ const App: React.FC = () => {
     setAvatarUrl(`https://api.dicebear.com/9.x/pixel-art/svg?seed=${PLAYER_NAME}`);
   };
 
-  const handleAvatarClick = () => {
-    if (isGenocide) return;
-    playSelect();
-    const line = AVATAR_LINES[Math.floor(Math.random() * AVATAR_LINES.length)];
-    setAvatarMessage(line);
+  const showAvatarLine = (text: string, important: boolean, duration: number) => {
+    setAvatarMessage(text);
+    setAvatarImportant(important);
     if (avatarMessageTimerRef.current) {
       window.clearTimeout(avatarMessageTimerRef.current);
     }
     avatarMessageTimerRef.current = window.setTimeout(() => {
       setAvatarMessage(null);
+      setAvatarImportant(false);
       avatarMessageTimerRef.current = null;
-    }, 3000);
+    }, duration);
+  };
+
+  const handleAvatarClick = () => {
+    if (isGenocide) return;
+    playSelect();
+
+    const nextCount = avatarClickCount + 1;
+    setAvatarClickCount(nextCount);
+
+    // Every fifth click reveals a hint about the secret route.
+    if (nextCount % 5 === 0) {
+      const hint = AVATAR_HINTS[Math.floor(nextCount / 5 - 1) % AVATAR_HINTS.length];
+      showAvatarLine(hint, true, 4000);
+      return;
+    }
+
+    const line = AVATAR_LINES[Math.floor(Math.random() * AVATAR_LINES.length)];
+    showAvatarLine(line, false, 3000);
   };
 
   const handleHomeClick = () => {
@@ -247,6 +277,11 @@ const App: React.FC = () => {
 
     const newHp = currentHpValue - DAMAGE_PER_HIT;
     setCurrentHpValue(newHp);
+
+    if (newHp === 1) {
+      playHeartbeat();
+      showAvatarLine(CRITICAL_LINE, true, 4500);
+    }
 
     if (newHp <= 0) {
       // Start the flip first, then swap the route while the screen is edge-on.
@@ -476,11 +511,18 @@ const App: React.FC = () => {
                     )}
                   </div>
 
+                  {/* Important hint marker */}
+                  {avatarImportant && !isGenocide && (
+                    <div className="absolute -top-4 -right-4 z-30 font-8bit text-3xl text-ut-yellow animate-bounce drop-shadow-[0_0_10px_rgba(250,204,21,0.9)]">
+                      !
+                    </div>
+                  )}
+
                   {/* Speech Bubble - Undertale Style */}
                   {!isGenocide && (avatarMessage || showSpeechBubble) && (
                     <div className="absolute z-20 pointer-events-none left-1/2 -translate-x-1/2 -top-16 w-max max-w-[220px] md:left-full md:top-0 md:ml-4 md:translate-x-0 md:max-w-none">
-                      <div className="bg-black border-2 border-white px-4 py-2 rounded-lg shadow-lg">
-                        <span className="font-pixel text-white text-sm">
+                      <div className={`bg-black border-2 px-4 py-2 rounded-lg shadow-lg ${avatarImportant ? 'border-ut-yellow shadow-[0_0_20px_rgba(250,204,21,0.5)]' : 'border-white'}`}>
+                        <span className={`font-pixel text-sm ${avatarImportant ? 'text-ut-yellow' : 'text-white'}`}>
                           * {avatarMessage ?? getVisitMessage(visitCount)}
                         </span>
                       </div>
@@ -567,7 +609,9 @@ const App: React.FC = () => {
                 <Typewriter
                   text={isGenocide
                     ? "* (The developer turned to dust.)"
-                    : (isPacifist ? "* The developer is happy!" : "* You encountered a wild developer!")}
+                    : (isCritical
+                      ? "* One more hit and this timeline ends."
+                      : (isPacifist ? "* The developer is happy!" : "* You encountered a wild developer!"))}
                   speed={40}
                   className={`font-pixel ${isGenocide ? 'text-ut-red' : 'text-ut-gray'}`}
                   enableSound={true}
@@ -668,7 +712,7 @@ const App: React.FC = () => {
             </div>
             <div className="flex items-center gap-2 md:gap-4">
               <span className={`text-xs ${isGenocide ? 'text-ut-red' : ''}`}>HP</span>
-              <div className={`w-24 md:w-48 h-4 md:h-5 ${isGenocide ? 'bg-ut-red border-ut-red' : 'bg-ut-red border-white/20'} flex items-center relative border-2`}>
+              <div className={`w-24 md:w-48 h-4 md:h-5 ${isGenocide ? 'bg-ut-red border-ut-red' : 'bg-ut-red border-white/20'} ${isCritical ? 'animate-pulse' : ''} flex items-center relative border-2`}>
                 <div
                   className={`absolute top-0 left-0 h-full ${isGenocide ? 'bg-black' : 'bg-ut-yellow'} transition-all duration-300`}
                   style={{ width: `${Math.max(0, (currentHpValue / MAX_HP) * 100)}%` }}
@@ -677,6 +721,9 @@ const App: React.FC = () => {
                   {Math.max(0, currentHpValue)} / {MAX_HP}
                 </div>
               </div>
+              {isCritical && (
+                <span className="font-8bit text-[10px] text-ut-red animate-pulse">CRITICAL</span>
+              )}
             </div>
           </div>
         </div>
@@ -768,6 +815,11 @@ const App: React.FC = () => {
 
       {/* Route change flash */}
       {routeFlash && <div className="fixed inset-0 z-[90] pointer-events-none bg-ut-red/10 animate-pulse" />}
+
+      {/* Low HP vignette */}
+      {isCritical && (
+        <div className="fixed inset-0 z-[85] pointer-events-none animate-pulse bg-[radial-gradient(circle_at_center,transparent_35%,rgba(255,0,0,0.30)_100%)]" />
+      )}
 
       {/* Transition curtain */}
       <div className={`fixed inset-0 bg-black z-[98] pointer-events-none transition-opacity duration-200 ${transitioning ? 'opacity-100' : 'opacity-0'}`} />

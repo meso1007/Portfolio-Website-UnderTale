@@ -309,3 +309,31 @@ export const playGlitch = () => {
     node.start(now);
   });
 };
+// 12. Heartbeat for the near-death state
+export const playHeartbeat = () => {
+  ensureContext().then(ctx => {
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    const thump = (start: number, baseFreq: number) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq, start);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.55, start + 0.18);
+
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.35, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.28);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.32);
+    };
+
+    thump(now, 72);
+    thump(now + 0.34, 62);
+  });
+};

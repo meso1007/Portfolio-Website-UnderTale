@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     MessageSquare, BarChart3, Code2, Sparkles, Trophy,
-    Github, ArrowLeft, CheckCircle2, Terminal
+    Github, ArrowLeft, CheckCircle2, Terminal, Lock, Unlock, Music
 } from 'lucide-react';
 import { Typewriter } from '../components/Typewriter';
-import { playConfirm, playMenuMove } from '../utils/sound';
+import { playConfirm, playGlitch, playMenuMove } from '../utils/sound';
 import { GameRoute } from '../types';
 
 interface SecretViewProps {
@@ -16,7 +16,7 @@ const STATS = [
     { label: 'PROJECTS SHIPPED', value: 5, display: '5' },
     { label: 'ROUTES', value: 3, display: '3' },
     { label: 'SOUND EFFECTS', value: 11, display: '11' },
-    { label: 'BGM TRACKS', value: 3, display: '3' },
+    { label: 'BGM TRACKS', value: 4, display: '4' },
     { label: 'SECRETS FOUND', value: 100, display: '1 / 1' },
     { label: 'DETERMINATION', value: 100, display: 'MAX' },
 ];
@@ -39,8 +39,24 @@ const LOG = [
     'Read the developer\'s notes',
 ];
 
+const STARS = [
+    { left: '6%', top: '8%', size: 14, delay: '0s' },
+    { left: '18%', top: '22%', size: 10, delay: '0.6s' },
+    { left: '32%', top: '6%', size: 8, delay: '1.2s' },
+    { left: '48%', top: '16%', size: 12, delay: '0.3s' },
+    { left: '64%', top: '7%', size: 9, delay: '1.5s' },
+    { left: '78%', top: '20%', size: 13, delay: '0.9s' },
+    { left: '90%', top: '10%', size: 8, delay: '0.2s' },
+    { left: '12%', top: '48%', size: 9, delay: '1.1s' },
+    { left: '88%', top: '46%', size: 10, delay: '0.5s' },
+];
+
+const HIDDEN_NOTE = `* The best portfolios are the ones you can play.
+* Thanks for making it all the way here.
+* — Shoya`;
+
 const Panel: React.FC<{ icon: React.ReactNode; title: string; children: React.ReactNode }> = ({ icon, title, children }) => (
-    <section className="border-2 border-white/20 bg-gray-950/60 p-5">
+    <section className="relative border-2 border-ut-yellow/40 bg-gray-950/70 p-5">
         <h3 className="flex items-center gap-3 font-8bit text-sm md:text-base text-ut-yellow mb-4">
             <span className="text-ut-yellow">{icon}</span>
             {title}
@@ -51,6 +67,7 @@ const Panel: React.FC<{ icon: React.ReactNode; title: string; children: React.Re
 
 export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
     const isGenocide = route === GameRoute.GENOCIDE;
+    const [decrypted, setDecrypted] = useState(false);
 
     if (isGenocide) {
         return (
@@ -65,24 +82,70 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
         );
     }
 
+    const handleDecrypt = () => {
+        if (decrypted) return;
+        playGlitch();
+        setDecrypted(true);
+    };
+
     return (
-        <div className="space-y-6 pb-4">
+        <div className="relative space-y-6 pb-4">
+            {/* Star field */}
+            <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+                {STARS.map((star, index) => (
+                    <span
+                        key={index}
+                        className="absolute text-ut-yellow/40 animate-pulse"
+                        style={{
+                            left: star.left,
+                            top: star.top,
+                            fontSize: `${star.size}px`,
+                            animationDelay: star.delay,
+                        }}
+                    >
+                        ✦
+                    </span>
+                ))}
+            </div>
+
             {/* Header */}
-            <div className="relative border-4 border-ut-yellow bg-gradient-to-b from-yellow-400/10 to-transparent p-6 text-center overflow-hidden">
+            <div className="relative border-4 border-ut-yellow bg-gradient-to-b from-yellow-400/15 via-transparent to-transparent p-6 text-center shadow-[0_0_40px_rgba(250,204,21,0.15)]">
                 <div className="absolute top-0 left-0 w-2 h-2 bg-ut-yellow" />
                 <div className="absolute top-0 right-0 w-2 h-2 bg-ut-yellow" />
                 <div className="absolute bottom-0 left-0 w-2 h-2 bg-ut-yellow" />
                 <div className="absolute bottom-0 right-0 w-2 h-2 bg-ut-yellow" />
 
-                <p className="font-pixel text-[10px] tracking-[0.3em] text-gray-500 mb-2">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                    <span className="font-8bit text-[9px] tracking-[0.25em] text-black bg-ut-yellow px-2 py-1">
+                        ACCESS GRANTED
+                    </span>
+                    <span className="font-8bit text-[9px] tracking-[0.25em] text-ut-yellow border border-ut-yellow px-2 py-1 flex items-center gap-1">
+                        <Music size={10} /> SECRET TRACK
+                    </span>
+                </div>
+
+                <p className="font-pixel text-[10px] tracking-[0.35em] text-gray-500 mb-2">
                     HIDDEN FILE 01
                 </p>
                 <h2 className="font-8bit text-xl md:text-3xl text-ut-yellow mb-3 animate-pulse">
-                    ??? SECRET ROUTE ???
+                    ??? DEVELOPER ROOM ???
                 </h2>
                 <p className="font-pixel text-gray-300 text-sm">
-                    * You found the path that isn't on the map.
+                    * A page that technically does not exist.
                 </p>
+            </div>
+
+            {/* Terminal */}
+            <div className="border-2 border-ut-yellow bg-black p-4 font-pixel text-sm">
+                <div className="flex items-center justify-between text-gray-500 text-[10px] mb-3 border-b border-white/10 pb-2">
+                    <span>shoya@portfolio</span>
+                    <span>secret.log</span>
+                </div>
+                <p className="text-ut-yellow">$ cat secret.log</p>
+                <p className="text-white">ACCESS GRANTED.</p>
+                <p className="text-white">ROUTE: SECRET</p>
+                <p className="text-gray-400">Loading the part of me that isn't on the resume...</p>
+                <p className="text-ut-yellow mt-1 animate-pulse">_</p>
             </div>
 
             {/* Developer message */}
@@ -159,8 +222,34 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
                 </ul>
             </Panel>
 
+            {/* Locked file */}
+            <section className="relative border-2 border-dashed border-ut-yellow/50 bg-black p-5">
+                <h3 className="flex items-center gap-3 font-8bit text-sm md:text-base text-ut-yellow mb-4">
+                    {decrypted ? <Unlock size={18} /> : <Lock size={18} />}
+                    HIDDEN FILE 02
+                </h3>
+                {decrypted ? (
+                    <div className="space-y-2 font-pixel text-yellow-200 text-sm animate-pulse">
+                        {HIDDEN_NOTE.split('\n').map((line) => (
+                            <p key={line}>{line}</p>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <p className="font-pixel text-gray-500 text-sm">* The file is locked.</p>
+                        <button
+                            onClick={handleDecrypt}
+                            onMouseEnter={() => playMenuMove()}
+                            className="font-8bit text-[10px] border border-ut-yellow text-ut-yellow px-4 py-2 hover:bg-ut-yellow hover:text-black transition-colors"
+                        >
+                            DECRYPT
+                        </button>
+                    </div>
+                )}
+            </section>
+
             {/* Footer actions */}
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 pt-2">
+            <div className="relative flex flex-col md:flex-row items-center justify-center gap-4 pt-2">
                 <a
                     href="https://github.com/meso1007/Portfolio-Website-UnderTale"
                     target="_blank"

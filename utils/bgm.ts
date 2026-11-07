@@ -1,6 +1,6 @@
 import { ensureContext, getAudioContext } from './sound';
 
-export type BgmTrack = 'NEUTRAL' | 'PACIFIST' | 'GENOCIDE';
+export type BgmTrack = 'NEUTRAL' | 'PACIFIST' | 'GENOCIDE' | 'SECRET';
 
 const STORAGE_KEY = 'undertale_bgm_muted';
 const MASTER_VOLUME = 0.16;
@@ -46,6 +46,17 @@ const TRACKS: Record<BgmTrack, TrackDefinition> = {
     bass: [
       33, null, null, null, 34, null, null, null, 33, null, null, null, 29, null, null, null,
       32, null, null, null, 33, null, null, null, 36, null, null, null, 34, null, null, null,
+    ],
+  },
+  SECRET: {
+    bpm: 84,
+    lead: [
+      84, null, 88, null, 91, null, 88, null, 86, null, 83, null, 79, null, null, null,
+      84, null, 88, null, 93, null, 91, null, 88, null, 86, null, 83, null, null, null,
+    ],
+    bass: [
+      40, null, null, null, 47, null, null, null, 45, null, null, null, 40, null, null, null,
+      40, null, null, null, 47, null, null, null, 43, null, null, null, 38, null, null, null,
     ],
   },
 };

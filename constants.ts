@@ -56,49 +56,49 @@ export const SKILLS: Skill[] = [
   {
     name: 'JAVA / SPRING BOOT',
     level: 84,
-    description: 'Casts enterprise-grade magic. Built for long battles.',
-    type: 'BACK'
-  },
-  {
-    name: 'GO',
-    level: 80,
-    description: 'Summons Goroutines for high-speed concurrency.',
+    description: 'Designs and ships REST APIs, batch jobs, and business logic in production.',
     type: 'BACK'
   },
   {
     name: 'TYPESCRIPT',
-    level: 88,
-    description: 'Equips a static type shield against bugs.',
+    level: 86,
+    description: 'Builds type-safe web interfaces with React and Next.js.',
     type: 'FRONT'
+  },
+  {
+    name: 'GO',
+    level: 80,
+    description: 'Writes CLI tools and backend services with goroutines and clean interfaces.',
+    type: 'BACK'
   },
   {
     name: 'PYTHON',
     level: 74,
-    description: 'Mines data & calculates fluid dynamics.',
+    description: 'Automates data processing, analysis, and research scripts.',
     type: 'BACK'
-  },
-  {
-    name: 'VUE.JS',
-    level: 78,
-    description: 'A lighter blade that reacts to every move.',
-    type: 'FRONT'
   },
   {
     name: 'KUBERNETES',
     level: 72,
-    description: 'Commands a fleet of containers. Auto-heals the party.',
+    description: 'Runs containerized services and handles deployments and scaling.',
     type: 'TOOL'
   },
   {
     name: 'JENKINS',
     level: 78,
-    description: 'Automates the grind. Never skips a build.',
+    description: 'Maintains CI/CD pipelines, automated tests, and release workflows.',
+    type: 'TOOL'
+  },
+  {
+    name: 'ENGLISH',
+    level: 88,
+    description: 'Professional working proficiency. Studied and worked in Canada.',
     type: 'TOOL'
   },
   {
     name: 'COFFEE',
     level: 99,
-    description: 'Restores HP. Essential for survival.',
+    description: 'Fuel for late-night debugging.',
     type: 'ITEM'
   },
 ];

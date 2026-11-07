@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Swords } from 'lucide-react';
 import { ViewState, GameRoute } from './types';
 import { PLAYER_NAME, PLAYER_LV, PLAYER_ROLE, PLAYER_LOCATION, PLAYER_TRAITS, INTRO_TITLE, INTRO_SUBTITLE, INTRO_START_TEXT } from './constants';
 import { BattleButton } from './components/BattleButton';
@@ -12,7 +13,7 @@ import { SecretView } from './views/SecretView';
 import { Ending } from './components/Ending';
 import pixelUser from './assets/pixel-user.png';
 import { Typewriter } from './components/Typewriter';
-import { playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch, playConfirm } from './utils/sound';
+import { playEncounterSequence, playMenuMove, ensureContext, playDamage, playSave, playGlitch, playConfirm, playSelect } from './utils/sound';
 import { SoulHeart } from './components/SoulHeart';
 import { SavePoint } from './components/SavePoint';
 import { BgmTrack, isBgmMuted, startBgm, setBgmTrack, toggleBgmMuted } from './utils/bgm';
@@ -22,6 +23,19 @@ const MAX_HP = 101;
 const DAMAGE_PER_HIT = 25;
 
 const VIEW_ORDER = [ViewState.FIGHT, ViewState.ACT, ViewState.ITEM, ViewState.MERCY];
+
+const AVATAR_LINES = [
+  "Still here? Good. Look around.",
+  "I built this whole thing, you know.",
+  "DETERMINATION is just another word for discipline.",
+  "You can press X to go back anytime.",
+  "The secret is closer than you think.",
+  "My favorite project? Probably Tagoly.",
+  "This site has three routes. You found one.",
+  "Coffee is a valid tech stack.",
+  "If you're hiring, my inbox is open.",
+  "Try attacking me. See what happens."
+];
 
 const WEB_DEV_PAINS = [
   "MERGE CONFLICT!",
@@ -55,6 +69,7 @@ const App: React.FC = () => {
   const [damageMsg, setDamageMsg] = useState<string>('');
   const [currentHpValue, setCurrentHpValue] = useState<number>(MAX_HP);
   const [showSpeechBubble, setShowSpeechBubble] = useState<boolean>(true);
+  const [avatarMessage, setAvatarMessage] = useState<string | null>(null);
 
   // Keyboard cursor (2x2 menu, row-major)
   const [cursor, setCursor] = useState<number>(0);
@@ -72,6 +87,7 @@ const App: React.FC = () => {
   // Ref to prevent double-counting in React Strict Mode
   const hasIncrementedRef = useRef(false);
   const transitionTimeoutRef = useRef<number | null>(null);
+  const avatarMessageTimerRef = useRef<number | null>(null);
 
   // Load visit count and city from localStorage, and fetch city if not found
   useEffect(() => {
@@ -147,16 +163,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!hasStarted) return;
-    setBgmTrack(bgmTrackFor(gameRoute));
+    setBgmTrack(view === ViewState.SECRET ? 'SECRET' : bgmTrackFor(gameRoute));
+  }, [gameRoute, hasStarted, view]);
+
+  useEffect(() => {
+    if (!hasStarted) return;
     if (gameRoute === GameRoute.GENOCIDE) {
       setRouteFlash(true);
-      setRouteFlip(true);
       const flashTimer = window.setTimeout(() => setRouteFlash(false), 600);
-      const flipTimer = window.setTimeout(() => setRouteFlip(false), 750);
-      return () => {
-        window.clearTimeout(flashTimer);
-        window.clearTimeout(flipTimer);
-      };
+      return () => window.clearTimeout(flashTimer);
     }
   }, [gameRoute, hasStarted]);
 
@@ -195,6 +210,20 @@ const App: React.FC = () => {
     setAvatarUrl(`https://api.dicebear.com/9.x/pixel-art/svg?seed=${PLAYER_NAME}`);
   };
 
+  const handleAvatarClick = () => {
+    if (isGenocide) return;
+    playSelect();
+    const line = AVATAR_LINES[Math.floor(Math.random() * AVATAR_LINES.length)];
+    setAvatarMessage(line);
+    if (avatarMessageTimerRef.current) {
+      window.clearTimeout(avatarMessageTimerRef.current);
+    }
+    avatarMessageTimerRef.current = window.setTimeout(() => {
+      setAvatarMessage(null);
+      avatarMessageTimerRef.current = null;
+    }, 3000);
+  };
+
   const handleHomeClick = () => {
     // In Genocide mode the name button becomes a TRUE RESET.
     if (isGenocide) {
@@ -220,13 +249,17 @@ const App: React.FC = () => {
     setCurrentHpValue(newHp);
 
     if (newHp <= 0) {
-      // Trigger GENOCIDE Route
+      // Start the flip first, then swap the route while the screen is edge-on.
       setTimeout(() => {
-        setGameRoute(GameRoute.GENOCIDE);
-        playGlitch();
-        setShowControls(true); // Keep controls shown in Genocide
-        setView(ViewState.INTRO);
-      }, 1000);
+        setRouteFlip(true);
+        window.setTimeout(() => {
+          setGameRoute(GameRoute.GENOCIDE);
+          playGlitch();
+          setShowControls(true); // Keep controls shown in Genocide
+          setView(ViewState.INTRO);
+        }, 360);
+        window.setTimeout(() => setRouteFlip(false), 820);
+      }, 900);
     }
 
     // Reset animation state after duration (longer now to read text)
@@ -416,7 +449,9 @@ const App: React.FC = () => {
               <div className="flex flex-col items-center gap-6 shrink-0 mx-auto md:mx-0 overflow-visible">
                 <div className="relative group overflow-visible">
                   <div
-                    className={`w-40 h-40 md:w-52 md:h-52 relative border-4 ${isGenocide ? 'border-ut-red' : 'border-white'} bg-black p-2 transition-all duration-75`}
+                    onClick={handleAvatarClick}
+                    title={isGenocide ? undefined : 'Talk to me'}
+                    className={`w-40 h-40 md:w-52 md:h-52 relative border-4 ${isGenocide ? 'border-ut-red' : 'border-white hover:border-ut-yellow cursor-pointer'} bg-black p-2 transition-all duration-75`}
                     style={{
                       filter: isAttacked ? 'sepia(1) saturate(5) hue-rotate(-50deg) contrast(1.5)' : 'none',
                       transform: isAttacked ? 'translateX(-4px)' : 'none'
@@ -441,16 +476,16 @@ const App: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Speech Bubble - Undertale Style (Absolute positioned) */}
-                  {!isGenocide && showSpeechBubble && (
-                    <div className={`absolute left-full ml-4 top-0 hidden md:block z-20 pointer-events-none transition-opacity duration-500 ${showSpeechBubble ? 'opacity-100' : 'opacity-0'}`}>
-                      <div className="bg-black border-2 border-white px-4 py-2 rounded-lg min-w-[200px] shadow-lg">
+                  {/* Speech Bubble - Undertale Style */}
+                  {!isGenocide && (avatarMessage || showSpeechBubble) && (
+                    <div className="absolute z-20 pointer-events-none left-1/2 -translate-x-1/2 -top-16 w-max max-w-[220px] md:left-full md:top-0 md:ml-4 md:translate-x-0 md:max-w-none">
+                      <div className="bg-black border-2 border-white px-4 py-2 rounded-lg shadow-lg">
                         <span className="font-pixel text-white text-sm">
-                          * {getVisitMessage(visitCount)}
+                          * {avatarMessage ?? getVisitMessage(visitCount)}
                         </span>
                       </div>
-                      {/* Triangle pointer (pointing left) */}
-                      <div className="absolute left-0 top-4 -translate-x-2">
+                      {/* Triangle pointer (pointing left, desktop only) */}
+                      <div className="hidden md:block absolute left-0 top-4 -translate-x-2">
                         <div className="w-0 h-0 border-t-[8px] border-t-transparent border-r-[8px] border-r-white border-b-[8px] border-b-transparent"></div>
                         <div className="absolute left-[2px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-r-[6px] border-r-black border-b-[6px] border-b-transparent"></div>
                       </div>
@@ -474,8 +509,9 @@ const App: React.FC = () => {
                       onMouseEnter={() => playMenuMove()}
                       tabIndex={showControls ? 0 : -1}
                     >
+                      <Swords size={20} className="shrink-0" strokeWidth={2.5} />
                       <span className="font-8bit text-ut-red group-hover:text-black text-sm md:text-base tracking-widest">
-                        ⚔ FIGHT
+                        FIGHT
                       </span>
                     </button>
                   </div>

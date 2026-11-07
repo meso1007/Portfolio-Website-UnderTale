@@ -48,10 +48,9 @@ const AVATAR_HINTS = [
 const CRITICAL_LINE = "Please... don't. I'll write the tests. I'll fix the bugs. I'll do anything.";
 
 const RESET_LINES = [
-  "Back to the beginning. Again.",
-  "You came back. I knew you would.",
-  "How many times are you going to defeat me?",
+  "Why... why did you defeat me?",
   "Again? Do you have nothing better to do?",
+  "How many times are you going to defeat me?",
   "I've lost count. Have you?"
 ];
 
@@ -327,7 +326,7 @@ const App: React.FC = () => {
       // ignore storage errors
     }
     const lineIndex = Math.min(nextResetCount - 1, RESET_LINES.length - 1);
-    showAvatarLine(RESET_LINES[Math.max(0, lineIndex)], nextResetCount >= 3, 4500);
+    showAvatarLine(RESET_LINES[Math.max(0, lineIndex)], nextResetCount >= 2, 4500);
 
     setEnding(null);
     setGameRoute(GameRoute.NEUTRAL);

@@ -15,9 +15,6 @@ const INITIAL_ENTRIES: GuestbookEntry[] = [
   { id: "2", name: "SANS", message: "cool website. i guess.", date: "202X-01-02" },
 ];
 
-// Always pinned to the top of the guestbook, regardless of the API response.
-const HOST_MESSAGE = "Thank you for visiting! I read every message here. If you want to see the rest of the site: SKILLS → HISTORY → CONTACT → PROJECTS.";
-
 export const SavePoint: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [entries, setEntries] = useState<GuestbookEntry[]>(INITIAL_ENTRIES);
@@ -214,20 +211,6 @@ export const SavePoint: React.FC = () => {
 
                 {/* List */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar border-t border-white/20 pt-4 space-y-4">
-                  {/* Pinned host message */}
-                  <div className="font-pixel border-l-2 border-ut-yellow pl-3 pb-3">
-                    <div className="flex justify-between items-baseline text-sm">
-                      <span className="text-ut-yellow flex items-center gap-2">
-                        SHOYA
-                        <span className="font-8bit text-[8px] border border-ut-yellow px-1 py-0.5">HOST</span>
-                      </span>
-                      <span className="text-gray-500 text-xs">PINNED</span>
-                    </div>
-                    <div className="text-yellow-100 pl-2 border-l-2 border-ut-yellow/40 ml-1 mt-1 break-words">
-                      {HOST_MESSAGE}
-                    </div>
-                  </div>
-
                   {isLoading && entries.length === 0 && (
                     <div className="text-center font-pixel text-gray-500 animate-pulse">* Loading...</div>
                   )}

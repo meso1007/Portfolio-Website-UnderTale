@@ -46,11 +46,16 @@
               '0%': { transform: 'rotateX(0deg)' },
               '50%': { transform: 'rotateX(90deg)' },
               '100%': { transform: 'rotateX(0deg)' },
+            },
+            twinkle: {
+              '0%, 100%': { opacity: '0.15', transform: 'scale(0.85)' },
+              '50%': { opacity: '0.95', transform: 'scale(1.15)' },
             }
           },
           animation: {
             shake: 'shake 0.2s ease-in-out infinite',
             flip: 'flip 0.75s ease-in-out',
+            twinkle: 'twinkle 4.5s ease-in-out infinite',
             float: 'float 2s ease-in-out infinite',
             glitch: 'glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite',
           }

@@ -233,43 +233,76 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                         </>
                     )}
 
-                    {/* Scene 2 — the letter */}
+                    {/* Scene 2 — the message */}
                     {step === 2 && (
                         <>
-                            <div className="relative mx-auto max-w-xl bg-[#f3ead7] text-[#211b12] px-7 py-8 md:px-10 md:py-10 text-left border border-[#d9c9a8] shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
-                                <div className="absolute top-5 right-5 flex h-11 w-11 rotate-[-8deg] items-center justify-center rounded-full border-2 border-[#b4493c]/70 text-[#b4493c]">
-                                    <span className="font-8bit text-[7px] leading-tight text-center">DET.<br />MAX</span>
+                            <p className="font-pixel text-[10px] tracking-[0.4em] text-gray-500 mb-3">
+                                SAVE FILE 03
+                            </p>
+                            <h1 className="font-8bit text-lg md:text-3xl text-ut-yellow tracking-widest mb-8">
+                                WHAT REMAINS
+                            </h1>
+
+                            <div className="mx-auto max-w-xl border-2 border-ut-yellow/70 bg-[#070a0d] p-6 md:p-8 text-left">
+                                <div className="flex items-center justify-between border-b border-ut-yellow/25 pb-3 mb-5">
+                                    <span className="font-8bit text-[9px] text-ut-yellow">A MESSAGE</span>
+                                    <SoulHeart className="w-4 h-4" />
                                 </div>
 
-                                <p className="font-serif text-[11px] uppercase tracking-[0.25em] text-[#8a7659] mb-5">
-                                    A letter, left in file 03
-                                </p>
-
-                                <div className="font-serif text-lg md:text-xl leading-[1.75] space-y-5">
-                                    <p>To whoever finds this,</p>
-                                    <p>
-                                        If you are reading this, you saw every room, every ending,
-                                        every version of me. Thank you for staying.
-                                    </p>
-                                    <p>
-                                        I built this place because I was afraid that nothing I made
-                                        would last. You made it last for a little while.
-                                    </p>
-                                    <p>
-                                        Keep building. The next save is yours.
-                                    </p>
-                                    <p className="text-right pt-2">— Shoya</p>
+                                <div className="space-y-3 font-pixel text-base md:text-lg text-white">
+                                    <Typewriter
+                                        text="* If you are reading this, you saw every room,"
+                                        speed={42}
+                                        enableSound={false}
+                                        className="block"
+                                    />
+                                    <Typewriter
+                                        text="  every ending, every version of me."
+                                        speed={42}
+                                        enableSound={false}
+                                        className="block"
+                                    />
+                                    <Typewriter
+                                        text="* Thank you for staying."
+                                        speed={42}
+                                        enableSound={false}
+                                        className="block"
+                                    />
+                                    <Typewriter
+                                        text="* I built this place because I was afraid"
+                                        speed={42}
+                                        enableSound={false}
+                                        className="block"
+                                    />
+                                    <Typewriter
+                                        text="  nothing I made would last."
+                                        speed={42}
+                                        enableSound={false}
+                                        className="block"
+                                    />
+                                    <Typewriter
+                                        text="* You made it last for a little while."
+                                        speed={42}
+                                        enableSound={false}
+                                        className="block"
+                                    />
+                                    <Typewriter
+                                        text="* Keep building. The next save is yours."
+                                        speed={42}
+                                        enableSound={false}
+                                        className="block"
+                                    />
                                 </div>
 
-                                <div className="mt-8 flex items-center justify-between border-t border-[#d9c9a8] pt-4">
-                                    <span className="font-pixel text-[10px] text-[#8a7659]">
-                                        {spared && killed ? 'You have been both. That is rare.' : 'Thank you for reading.'}
+                                <div className="mt-7 flex items-center justify-between border-t border-ut-yellow/15 pt-4">
+                                    <span className="font-pixel text-[10px] text-gray-500">
+                                        {spared && killed ? '* You have been both. That is rare.' : '* Thank you for reading.'}
                                     </span>
-                                    <SoulHeart className="w-3.5 h-3.5 opacity-70" />
+                                    <span className="font-8bit text-[10px] text-ut-yellow">— SHOYA</span>
                                 </div>
                             </div>
 
-                            {/* A single shooting star across the letter scene */}
+                            {/* A single shooting star across the scene */}
                             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                                 <div className="absolute left-[78%] top-[14%] h-px w-40 -rotate-[18deg] bg-gradient-to-r from-transparent via-ut-yellow/70 to-transparent animate-shoot" />
                             </div>

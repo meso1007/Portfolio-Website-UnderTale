@@ -278,71 +278,120 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                             <p className="font-pixel text-[10px] tracking-[0.4em] text-gray-500 mb-3">
                                 SAVE FILE 03
                             </p>
-                            <h1 className="font-8bit text-lg md:text-3xl text-ut-yellow tracking-widest mb-8">
+                            <h1 className="font-8bit text-lg md:text-3xl text-ut-yellow tracking-widest mb-10">
                                 WHAT REMAINS
                             </h1>
 
-                            <div className="mx-auto max-w-xl border-2 border-ut-yellow/70 bg-[#070a0d] px-7 py-9 md:px-10 md:py-11 text-center">
-                                <div className="flex items-center justify-center gap-3 border-b border-ut-yellow/20 pb-4 mb-7">
-                                    <SoulHeart className="w-4 h-4" />
-                                    <span className="font-8bit text-[9px] text-ut-yellow tracking-[0.2em]">A MESSAGE</span>
-                                    <SoulHeart className="w-4 h-4" />
+                            <div className="relative mx-auto max-w-xl">
+                                {/* Soft light behind the file */}
+                                <div className="pointer-events-none absolute -inset-8 bg-[radial-gradient(ellipse_at_center,rgba(250,204,21,0.10),transparent_65%)]" />
+
+                                <div className="relative border border-ut-yellow/45 bg-[#060809]">
+                                    {/* Inner hairline frame */}
+                                    <div className="pointer-events-none absolute inset-[6px] border border-ut-yellow/15" />
+
+                                    {/* Corner brackets */}
+                                    <div className="pointer-events-none absolute left-2 top-2 h-4 w-4 border-l border-t border-ut-yellow/70" />
+                                    <div className="pointer-events-none absolute right-2 top-2 h-4 w-4 border-r border-t border-ut-yellow/70" />
+                                    <div className="pointer-events-none absolute bottom-2 left-2 h-4 w-4 border-b border-l border-ut-yellow/70" />
+                                    <div className="pointer-events-none absolute bottom-2 right-2 h-4 w-4 border-b border-r border-ut-yellow/70" />
+
+                                    {/* Header */}
+                                    <div className="relative flex items-center justify-between border-b border-ut-yellow/20 px-7 py-4">
+                                        <span className="font-8bit text-[8px] tracking-[0.2em] text-ut-yellow/80">
+                                            FILE 03
+                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="h-px w-6 bg-ut-yellow/40" />
+                                            <SoulHeart className="w-3 h-3" />
+                                            <span className="font-8bit text-[8px] tracking-[0.2em] text-ut-yellow/80">
+                                                A MESSAGE
+                                            </span>
+                                            <span className="h-px w-6 bg-ut-yellow/40" />
+                                        </div>
+                                        <span className="font-8bit text-[8px] tracking-[0.2em] text-ut-yellow/80">
+                                            INTACT
+                                        </span>
+                                    </div>
+
+                                    {/* Body */}
+                                    <div className="relative px-7 py-9 md:px-10 md:py-11 text-center">
+                                        <div className="mb-7 font-pixel text-xl md:text-2xl text-ut-yellow">
+                                            <Typewriter
+                                                text="Thank you for staying."
+                                                speed={50}
+                                                enableSound={false}
+                                                className="block"
+                                            />
+                                        </div>
+
+                                        <div className="mx-auto max-w-md space-y-4 font-pixel text-sm md:text-base leading-relaxed text-gray-200">
+                                            <Typewriter
+                                                text="You saw every room, every ending,"
+                                                speed={38}
+                                                enableSound={false}
+                                                className="block"
+                                            />
+                                            <Typewriter
+                                                text="every version of me."
+                                                speed={38}
+                                                enableSound={false}
+                                                className="block"
+                                            />
+                                            <Typewriter
+                                                text="I built this place because I was afraid"
+                                                speed={38}
+                                                enableSound={false}
+                                                className="block"
+                                            />
+                                            <Typewriter
+                                                text="that nothing I made would last."
+                                                speed={38}
+                                                enableSound={false}
+                                                className="block"
+                                            />
+                                            <Typewriter
+                                                text="You made it last for a little while."
+                                                speed={38}
+                                                enableSound={false}
+                                                className="block"
+                                            />
+                                            <Typewriter
+                                                text="Keep building."
+                                                speed={38}
+                                                enableSound={false}
+                                                className="block text-ut-yellow/90"
+                                            />
+                                            <Typewriter
+                                                text="The next save is yours."
+                                                speed={38}
+                                                enableSound={false}
+                                                className="block text-ut-yellow/90"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="relative flex items-center justify-between border-t border-ut-yellow/15 px-7 py-4">
+                                        <span className="font-pixel text-[10px] text-gray-600">
+                                            SAVE 03 · DETERMINATION MAX
+                                        </span>
+                                        <span className="font-8bit text-[9px] text-ut-yellow">
+                                            — SHOYA
+                                        </span>
+                                    </div>
+
+                                    {/* Scanlines */}
+                                    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.35)_50%)] bg-[length:100%_4px] opacity-20" />
                                 </div>
 
-                                <div className="space-y-5 font-pixel text-base md:text-lg leading-relaxed text-gray-100">
-                                    <Typewriter
-                                        text="Thank you for staying."
-                                        speed={42}
-                                        enableSound={false}
-                                        className="block"
-                                    />
-                                    <Typewriter
-                                        text="You saw every room, every ending,"
-                                        speed={42}
-                                        enableSound={false}
-                                        className="block"
-                                    />
-                                    <Typewriter
-                                        text="every version of me."
-                                        speed={42}
-                                        enableSound={false}
-                                        className="block"
-                                    />
-                                    <Typewriter
-                                        text="I built this place because I was afraid"
-                                        speed={42}
-                                        enableSound={false}
-                                        className="block"
-                                    />
-                                    <Typewriter
-                                        text="that nothing I made would last."
-                                        speed={42}
-                                        enableSound={false}
-                                        className="block"
-                                    />
-                                    <Typewriter
-                                        text="You made it last for a little while."
-                                        speed={42}
-                                        enableSound={false}
-                                        className="block"
-                                    />
-                                    <Typewriter
-                                        text="Keep building."
-                                        speed={42}
-                                        enableSound={false}
-                                        className="block"
-                                    />
-                                    <Typewriter
-                                        text="The next save is yours."
-                                        speed={42}
-                                        enableSound={false}
-                                        className="block"
-                                    />
+                                {/* Seal */}
+                                <div className="absolute -bottom-5 -right-4 flex h-14 w-14 rotate-[-10deg] items-center justify-center rounded-full border border-ut-yellow/40 bg-[#0b0f14] text-ut-yellow shadow-[0_0_20px_rgba(250,204,21,0.12)]">
+                                    <span className="font-8bit text-[7px] leading-tight text-center">
+                                        DET.<br />MAX
+                                    </span>
                                 </div>
-
-                                <p className="mt-8 font-8bit text-[10px] text-ut-yellow">— SHOYA</p>
                             </div>
-
                         </>
                     )}
 

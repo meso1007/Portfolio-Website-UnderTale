@@ -7,7 +7,7 @@
   <title>UNDERTALE Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=EB+Garamond:wght@400;500&family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -16,6 +16,7 @@
           fontFamily: {
             '8bit': ['"Press Start 2P"', 'cursive'],
             'pixel': ['"DotGothic16"', 'sans-serif'],
+            'serif': ['"EB Garamond"', 'Georgia', 'serif'],
           },
           colors: {
             'ut-black': '#000000',
@@ -50,12 +51,18 @@
             twinkle: {
               '0%, 100%': { opacity: '0.15', transform: 'scale(0.85)' },
               '50%': { opacity: '0.95', transform: 'scale(1.15)' },
+            },
+            shoot: {
+              '0%': { transform: 'translate3d(0, 0, 0) rotate(-18deg)', opacity: '0' },
+              '12%': { opacity: '1' },
+              '100%': { transform: 'translate3d(-72vw, 26vh, 0) rotate(-18deg)', opacity: '0' },
             }
           },
           animation: {
             shake: 'shake 0.2s ease-in-out infinite',
             flip: 'flip 0.75s ease-in-out',
             twinkle: 'twinkle 4.5s ease-in-out infinite',
+            shoot: 'shoot 6s ease-out 1.2s 1 both',
             float: 'float 2s ease-in-out infinite',
             glitch: 'glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite',
           }

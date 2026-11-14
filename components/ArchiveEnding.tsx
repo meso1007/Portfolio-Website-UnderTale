@@ -40,6 +40,14 @@ const readNumber = (storage: Storage, key: string, fallback: number): number => 
     }
 };
 
+const SaveRow: React.FC<{ label: string; value: string; accent?: boolean }> = ({ label, value, accent }) => (
+    <div className="flex items-baseline gap-3">
+        <span className="font-pixel text-xs text-gray-500 uppercase tracking-wide">{label}</span>
+        <span className="flex-1 border-b border-dotted border-white/15" />
+        <span className={`font-8bit text-[10px] ${accent ? 'text-ut-yellow' : 'text-gray-200'}`}>{value}</span>
+    </div>
+);
+
 export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTitle }) => {
     const [step, setStep] = useState(0);
     const [started, setStarted] = useState(false);
@@ -50,13 +58,14 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
     const [resetCount] = useState(() => readNumber(sessionStorage, 'undertale_reset_count', 0));
     const [spared] = useState(() => isAchievementUnlocked('pacifist'));
     const [killed] = useState(() => isAchievementUnlocked('genocide'));
+    const [leftMessage] = useState(() => isAchievementUnlocked('guestbook'));
 
     // Let the stars breathe before the story begins.
     useEffect(() => {
         const timer = window.setTimeout(() => {
             setStarted(true);
             window.setTimeout(() => setSceneVisible(true), 250);
-        }, 2600);
+        }, 2400);
         return () => window.clearTimeout(timer);
     }, []);
 
@@ -82,7 +91,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
             setStep((current) => current + 1);
             transitioningRef.current = false;
             window.setTimeout(() => setSceneVisible(true), 120);
-        }, 950);
+        }, 900);
     };
 
     useEffect(() => {
@@ -120,7 +129,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
         }
         if (step === 1) {
             return {
-                badge: 'SAVE FILE 01',
+                badge: 'SAVE FILE 03',
                 title: 'THE ONE WHO STAYED',
                 lines: [
                     `* You have visited ${visitCount} ${visitCount === 1 ? 'time' : 'times'}.`,
@@ -131,38 +140,21 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                 ],
             };
         }
-        if (step === 2) {
-            return {
-                badge: 'SAVE FILE 02',
-                title: 'WHAT REMAINS',
-                lines: [
-                    '* This is not a portfolio.',
-                    '* It is the place I built so that someone might find me.',
-                    '* Every reset. Every ending. Every quiet message.',
-                    '* I kept them all.',
-                    '* If you remember one thing, remember this: keep building.',
-                ],
-            };
-        }
         return {
-            badge: 'SAVE FILE 03',
-            title: 'IF YOU EVER COME BACK',
-            lines: [
-                '* The stars will remember you.',
-                '* Thank you for playing.',
-            ],
+            badge: '',
+            title: '',
+            lines: [],
         };
     })();
+
+    const showChoices = step === 3;
 
     return createPortal(
         <div
             className="fixed inset-0 z-[120] bg-black overflow-y-auto"
             onClick={() => { if (isTyping()) skipTyping(); }}
         >
-            {/* Slow vignette */}
-            <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(250,204,21,0.05),transparent_55%)]" />
-
-            {/* Stars — always visible, slowly twinkling */}
+            {/* Stars */}
             <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
                 {STARS.map((star, index) => (
                     <Star
@@ -178,46 +170,130 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                 ))}
             </div>
 
-            <div className="relative min-h-full flex items-center justify-center p-6 py-12">
+            <div className="relative min-h-full flex items-center justify-center px-6 py-16">
                 <div
-                    className={`relative w-full max-w-2xl text-center transition-opacity duration-[1400ms] ${started && sceneVisible ? 'opacity-100' : 'opacity-0'}`}
+                    className={`relative w-full max-w-2xl text-center transition-opacity duration-[1200ms] ${started && sceneVisible ? 'opacity-100' : 'opacity-0'}`}
                 >
-                    <p className="font-pixel text-[10px] tracking-[0.4em] text-gray-500 mb-2">
-                        {scene.badge}
-                    </p>
-                    <h1 className="font-8bit text-xl md:text-4xl text-ut-yellow tracking-widest mb-6">
-                        {scene.title}
-                    </h1>
-
+                    {/* Scene 0 — title */}
                     {step === 0 && (
-                        <div className="mb-8 flex justify-center animate-float">
-                            <SoulHeart className="w-12 h-12 md:w-14 md:h-14 text-yellow-400 fill-yellow-400" />
-                        </div>
+                        <>
+                            <p className="font-pixel text-[10px] tracking-[0.4em] text-gray-500 mb-3">
+                                {scene.badge}
+                            </p>
+                            <h1 className="font-8bit text-xl md:text-4xl text-ut-yellow tracking-widest mb-8">
+                                {scene.title}
+                            </h1>
+                            <div className="mb-8 flex justify-center">
+                                <SoulHeart className="w-10 h-10 md:w-12 md:h-12 text-yellow-400 fill-yellow-400 animate-float" />
+                            </div>
+                            <div className="space-y-3 font-pixel text-base md:text-lg text-white min-h-[7rem]">
+                                {scene.lines.map((line, index) => (
+                                    <Typewriter
+                                        key={`0-${index}`}
+                                        text={line}
+                                        speed={48}
+                                        enableSound={false}
+                                        className="block"
+                                    />
+                                ))}
+                            </div>
+                        </>
                     )}
 
-                    <div className="space-y-3 font-pixel text-base md:text-lg text-white mb-10 min-h-[12rem]">
-                        {scene.lines.map((line, index) => (
-                            <Typewriter
-                                key={`${step}-${index}`}
-                                text={line}
-                                speed={44}
-                                enableSound={false}
-                                className="block"
-                            />
-                        ))}
-                    </div>
-
-                    {step < 3 ? (
-                        <button
-                            onClick={(event) => { event.stopPropagation(); advance(); }}
-                            onMouseEnter={() => playMenuMove()}
-                            className="font-8bit text-xs border-2 border-ut-yellow/80 text-ut-yellow px-8 py-3 hover:bg-ut-yellow hover:text-black transition-colors"
-                        >
-                            CONTINUE
-                        </button>
-                    ) : (
+                    {/* Scene 1 — save file */}
+                    {step === 1 && (
                         <>
-                            <div className={`flex flex-col md:flex-row items-center justify-center gap-4 transition-opacity duration-1000 ${sceneVisible ? 'opacity-100' : 'opacity-0'}`}>
+                            <p className="font-pixel text-[10px] tracking-[0.4em] text-gray-500 mb-3">
+                                SAVE FILE 03
+                            </p>
+                            <h1 className="font-8bit text-lg md:text-3xl text-ut-yellow tracking-widest mb-8">
+                                THE ONE WHO STAYED
+                            </h1>
+
+                            <div className="mx-auto max-w-md border-2 border-ut-yellow/60 bg-[#070a0d] p-6 text-left">
+                                <div className="flex items-center justify-between border-b border-ut-yellow/25 pb-3 mb-5">
+                                    <span className="font-8bit text-[9px] text-ut-yellow">SAVE DATA</span>
+                                    <SoulHeart className="w-4 h-4" />
+                                </div>
+                                <div className="space-y-4">
+                                    <SaveRow label="Visits" value={String(visitCount)} />
+                                    <SaveRow label="Resets" value={String(resetCount)} />
+                                    <SaveRow label="Routes" value="3 / 3" />
+                                    <SaveRow label="Messages" value={leftMessage ? '1' : '0'} />
+                                    <SaveRow label="Determination" value="MAX" accent />
+                                </div>
+                                <p className="mt-6 font-pixel text-[11px] text-gray-600">
+                                    * The file is intact.
+                                </p>
+                            </div>
+
+                            <p className="mt-6 font-pixel text-sm text-gray-400">
+                                Some people pass through and leave nothing. You stayed long enough to leave a light on.
+                            </p>
+                        </>
+                    )}
+
+                    {/* Scene 2 — the letter */}
+                    {step === 2 && (
+                        <>
+                            <div className="relative mx-auto max-w-xl bg-[#f3ead7] text-[#211b12] px-7 py-8 md:px-10 md:py-10 text-left border border-[#d9c9a8] shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
+                                <div className="absolute top-5 right-5 flex h-11 w-11 rotate-[-8deg] items-center justify-center rounded-full border-2 border-[#b4493c]/70 text-[#b4493c]">
+                                    <span className="font-8bit text-[7px] leading-tight text-center">DET.<br />MAX</span>
+                                </div>
+
+                                <p className="font-serif text-[11px] uppercase tracking-[0.25em] text-[#8a7659] mb-5">
+                                    A letter, left in file 03
+                                </p>
+
+                                <div className="font-serif text-lg md:text-xl leading-[1.75] space-y-5">
+                                    <p>To whoever finds this,</p>
+                                    <p>
+                                        If you are reading this, you saw every room, every ending,
+                                        every version of me. Thank you for staying.
+                                    </p>
+                                    <p>
+                                        I built this place because I was afraid that nothing I made
+                                        would last. You made it last for a little while.
+                                    </p>
+                                    <p>
+                                        Keep building. The next save is yours.
+                                    </p>
+                                    <p className="text-right pt-2">— Shoya</p>
+                                </div>
+
+                                <div className="mt-8 flex items-center justify-between border-t border-[#d9c9a8] pt-4">
+                                    <span className="font-pixel text-[10px] text-[#8a7659]">
+                                        {spared && killed ? 'You have been both. That is rare.' : 'Thank you for reading.'}
+                                    </span>
+                                    <SoulHeart className="w-3.5 h-3.5 opacity-70" />
+                                </div>
+                            </div>
+
+                            {/* A single shooting star across the letter scene */}
+                            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                                <div className="absolute left-[78%] top-[14%] h-px w-40 -rotate-[18deg] bg-gradient-to-r from-transparent via-ut-yellow/70 to-transparent animate-shoot" />
+                            </div>
+                        </>
+                    )}
+
+                    {/* Scene 3 — farewell */}
+                    {step === 3 && (
+                        <>
+                            <p className="font-pixel text-[10px] tracking-[0.4em] text-gray-500 mb-3">
+                                SAVE FILE 03
+                            </p>
+                            <h1 className="font-8bit text-lg md:text-3xl text-ut-yellow tracking-widest mb-8">
+                                IF YOU EVER COME BACK
+                            </h1>
+                            <div className="mb-8 flex justify-center">
+                                <SoulHeart className="w-10 h-10 md:w-12 md:h-12 text-yellow-400 fill-yellow-400 animate-float" />
+                            </div>
+                            <div className="space-y-3 font-pixel text-base md:text-lg text-white mb-10">
+                                <Typewriter text="* The stars will remember you." speed={48} enableSound={false} className="block" />
+                                <Typewriter text="* Thank you for playing." speed={48} enableSound={false} className="block" />
+                            </div>
+
+                            <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                                 <button
                                     onClick={(event) => { event.stopPropagation(); playSave(); onStay(); }}
                                     onMouseEnter={() => playMenuMove()}
@@ -233,13 +309,22 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                     CLOSE THE FILE
                                 </button>
                             </div>
-                            <p className="mt-5 font-pixel text-[10px] text-gray-500">
-                                {spared && killed ? '* You have been both. That is rare.' : '* Thank you for reading.'}
-                            </p>
                         </>
                     )}
 
-                    <div className="border-t border-white/10 pt-4 mt-12 space-y-1 font-pixel text-[10px] text-gray-600">
+                    {/* Progress + credits */}
+                    {!showChoices && (
+                        <div className="mt-10 flex items-center justify-center gap-2">
+                            {[0, 1, 2, 3].map((dot) => (
+                                <span
+                                    key={dot}
+                                    className={`h-1.5 w-1.5 rounded-full ${dot === step ? 'bg-ut-yellow' : 'bg-white/20'}`}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="border-t border-white/10 pt-4 mt-10 space-y-1 font-pixel text-[10px] text-gray-600">
                         <p>BUILT BY SHOYA HORIUCHI</p>
                         <p>INSPIRED BY UNDERTALE BY TOBY FOX</p>
                     </div>

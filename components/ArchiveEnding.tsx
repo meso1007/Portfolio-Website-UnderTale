@@ -243,63 +243,65 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                 WHAT REMAINS
                             </h1>
 
-                            <div className="mx-auto max-w-xl border-2 border-ut-yellow/70 bg-[#070a0d] p-6 md:p-8 text-left">
-                                <div className="flex items-center justify-between border-b border-ut-yellow/25 pb-3 mb-5">
-                                    <span className="font-8bit text-[9px] text-ut-yellow">A MESSAGE</span>
+                            <div className="mx-auto max-w-xl border-2 border-ut-yellow/70 bg-[#070a0d] px-7 py-9 md:px-10 md:py-11 text-center">
+                                <div className="flex items-center justify-center gap-3 border-b border-ut-yellow/20 pb-4 mb-7">
+                                    <SoulHeart className="w-4 h-4" />
+                                    <span className="font-8bit text-[9px] text-ut-yellow tracking-[0.2em]">A MESSAGE</span>
                                     <SoulHeart className="w-4 h-4" />
                                 </div>
 
-                                <div className="space-y-3 font-pixel text-base md:text-lg text-white">
+                                <div className="space-y-5 font-pixel text-base md:text-lg leading-relaxed text-gray-100">
                                     <Typewriter
-                                        text="* If you are reading this, you saw every room,"
+                                        text="Thank you for staying."
                                         speed={42}
                                         enableSound={false}
                                         className="block"
                                     />
                                     <Typewriter
-                                        text="  every ending, every version of me."
+                                        text="You saw every room, every ending,"
                                         speed={42}
                                         enableSound={false}
                                         className="block"
                                     />
                                     <Typewriter
-                                        text="* Thank you for staying."
+                                        text="every version of me."
                                         speed={42}
                                         enableSound={false}
                                         className="block"
                                     />
                                     <Typewriter
-                                        text="* I built this place because I was afraid"
+                                        text="I built this place because I was afraid"
                                         speed={42}
                                         enableSound={false}
                                         className="block"
                                     />
                                     <Typewriter
-                                        text="  nothing I made would last."
+                                        text="that nothing I made would last."
                                         speed={42}
                                         enableSound={false}
                                         className="block"
                                     />
                                     <Typewriter
-                                        text="* You made it last for a little while."
+                                        text="You made it last for a little while."
                                         speed={42}
                                         enableSound={false}
                                         className="block"
                                     />
                                     <Typewriter
-                                        text="* Keep building. The next save is yours."
+                                        text="Keep building."
+                                        speed={42}
+                                        enableSound={false}
+                                        className="block"
+                                    />
+                                    <Typewriter
+                                        text="The next save is yours."
                                         speed={42}
                                         enableSound={false}
                                         className="block"
                                     />
                                 </div>
 
-                                <div className="mt-7 flex items-center justify-between border-t border-ut-yellow/15 pt-4">
-                                    <span className="font-pixel text-[10px] text-gray-500">
-                                        {spared && killed ? '* You have been both. That is rare.' : '* Thank you for reading.'}
-                                    </span>
-                                    <span className="font-8bit text-[10px] text-ut-yellow">— SHOYA</span>
-                                </div>
+                                <p className="mt-8 font-8bit text-[10px] text-ut-yellow">— SHOYA</p>
                             </div>
 
                             {/* A single shooting star across the scene */}

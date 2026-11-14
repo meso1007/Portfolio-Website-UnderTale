@@ -31,6 +31,17 @@ const STARS = [
     { left: '91%', top: '80%', size: 9, delay: '0.2s' },
 ];
 
+const SHOOTING_STARS = [
+    { left: '88%', top: '8%', delay: '0.6s', duration: '5.5s', width: '9rem' },
+    { left: '64%', top: '16%', delay: '3.2s', duration: '7s', width: '7rem' },
+    { left: '96%', top: '30%', delay: '6.0s', duration: '6s', width: '10rem' },
+    { left: '72%', top: '44%', delay: '9.4s', duration: '8s', width: '6rem' },
+    { left: '42%', top: '12%', delay: '12.0s', duration: '6.5s', width: '8rem' },
+    { left: '90%', top: '58%', delay: '15.5s', duration: '7.5s', width: '7rem' },
+    { left: '55%', top: '28%', delay: '18.0s', duration: '9s', width: '5rem' },
+    { left: '80%', top: '74%', delay: '21.0s', duration: '6s', width: '9rem' },
+];
+
 const readNumber = (storage: Storage, key: string, fallback: number): number => {
     try {
         const value = Number(storage.getItem(key));
@@ -170,6 +181,24 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                 ))}
             </div>
 
+            {/* Shooting stars */}
+            <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+                {SHOOTING_STARS.map((star, index) => (
+                    <div
+                        key={index}
+                        className="absolute h-px animate-shoot bg-gradient-to-r from-transparent via-ut-yellow/70 to-transparent"
+                        style={{
+                            left: star.left,
+                            top: star.top,
+                            width: star.width,
+                            animationDelay: star.delay,
+                            animationDuration: star.duration,
+                            animationIterationCount: 'infinite',
+                        }}
+                    />
+                ))}
+            </div>
+
             <div className="relative min-h-full flex items-center justify-center px-6 py-16">
                 <div
                     className={`relative w-full max-w-2xl text-center transition-opacity duration-[1200ms] ${started && sceneVisible ? 'opacity-100' : 'opacity-0'}`}
@@ -304,10 +333,6 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                 <p className="mt-8 font-8bit text-[10px] text-ut-yellow">— SHOYA</p>
                             </div>
 
-                            {/* A single shooting star across the scene */}
-                            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                                <div className="absolute left-[78%] top-[14%] h-px w-40 -rotate-[18deg] bg-gradient-to-r from-transparent via-ut-yellow/70 to-transparent animate-shoot" />
-                            </div>
                         </>
                     )}
 

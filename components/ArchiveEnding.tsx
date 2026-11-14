@@ -32,14 +32,14 @@ const STARS = [
 ];
 
 const SHOOTING_STARS = [
-    { left: '88%', top: '8%', delay: '0.6s', duration: '5.5s', width: '9rem' },
-    { left: '64%', top: '16%', delay: '3.2s', duration: '7s', width: '7rem' },
-    { left: '96%', top: '30%', delay: '6.0s', duration: '6s', width: '10rem' },
-    { left: '72%', top: '44%', delay: '9.4s', duration: '8s', width: '6rem' },
-    { left: '42%', top: '12%', delay: '12.0s', duration: '6.5s', width: '8rem' },
-    { left: '90%', top: '58%', delay: '15.5s', duration: '7.5s', width: '7rem' },
-    { left: '55%', top: '28%', delay: '18.0s', duration: '9s', width: '5rem' },
-    { left: '80%', top: '74%', delay: '21.0s', duration: '6s', width: '9rem' },
+    { left: '88%', top: '8%', delay: '0.6s', duration: '5.5s', width: '9rem', opacity: 0.9 },
+    { left: '64%', top: '16%', delay: '3.2s', duration: '7s', width: '7rem', opacity: 0.55 },
+    { left: '96%', top: '30%', delay: '6.0s', duration: '6s', width: '10rem', opacity: 0.8 },
+    { left: '72%', top: '44%', delay: '9.4s', duration: '8s', width: '6rem', opacity: 0.45 },
+    { left: '42%', top: '12%', delay: '12.0s', duration: '6.5s', width: '8rem', opacity: 0.7 },
+    { left: '90%', top: '58%', delay: '15.5s', duration: '7.5s', width: '7rem', opacity: 0.5 },
+    { left: '55%', top: '28%', delay: '18.0s', duration: '9s', width: '5rem', opacity: 0.4 },
+    { left: '80%', top: '74%', delay: '21.0s', duration: '6s', width: '9rem', opacity: 0.85 },
 ];
 
 const readNumber = (storage: Storage, key: string, fallback: number): number => {
@@ -186,16 +186,26 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                 {SHOOTING_STARS.map((star, index) => (
                     <div
                         key={index}
-                        className="absolute h-px animate-shoot bg-gradient-to-r from-transparent via-ut-yellow/70 to-transparent"
+                        className="absolute h-px animate-shoot"
                         style={{
                             left: star.left,
                             top: star.top,
                             width: star.width,
+                            opacity: star.opacity,
                             animationDelay: star.delay,
                             animationDuration: star.duration,
                             animationIterationCount: 'infinite',
                         }}
-                    />
+                    >
+                        {/* Soft halo */}
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-ut-yellow/25 via-ut-yellow/10 to-transparent blur-[2px]" />
+                        {/* Tail */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-ut-yellow/90 via-ut-yellow/35 to-transparent" />
+                        {/* Bright core near the head */}
+                        <div className="absolute left-0 top-1/2 h-px w-1/2 -translate-y-1/2 bg-gradient-to-r from-white via-white/70 to-transparent" />
+                        {/* Head */}
+                        <div className="absolute left-0 top-1/2 h-[3px] w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_8px_2px_rgba(250,204,21,0.55)]" />
+                    </div>
                 ))}
             </div>
 

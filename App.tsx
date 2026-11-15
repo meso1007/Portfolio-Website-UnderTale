@@ -844,7 +844,7 @@ const App: React.FC = () => {
 
         {/* Main Display Area */}
         <div
-          className={`relative w-full border-4 ${isGenocide ? 'border-ut-red animate-pulse' : 'border-white'} min-h-[300px] md:min-h-[400px] p-6 bg-black overflow-hidden`}
+          className={`relative w-full border-4 ${isGenocide ? 'border-ut-red animate-pulse' : 'border-white'} h-[420px] md:h-[480px] p-6 bg-black overflow-hidden`}
           onClick={() => { if (isTyping()) skipTyping(); }}
         >
           {(view !== ViewState.INTRO) && (

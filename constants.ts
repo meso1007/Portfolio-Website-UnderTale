@@ -54,33 +54,27 @@ export const PROJECTS: Project[] = [
 
 export const SKILLS: Skill[] = [
   {
-    name: 'JAVA / SPRING BOOT',
+    name: 'BACKEND',
     level: 84,
-    description: 'Designs and ships REST APIs, batch jobs, and business logic in production.',
+    description: 'Java / Spring Boot for APIs and batch jobs; Go for CLIs and services.',
     type: 'BACK'
   },
   {
-    name: 'TYPESCRIPT',
+    name: 'FRONTEND',
     level: 86,
-    description: 'Builds type-safe web interfaces with React and Next.js.',
+    description: 'Type-safe interfaces with TypeScript, React, and Next.js.',
     type: 'FRONT'
   },
   {
-    name: 'GO',
-    level: 80,
-    description: 'Writes CLI tools and backend services with goroutines and clean interfaces.',
-    type: 'BACK'
-  },
-  {
-    name: 'KUBERNETES',
-    level: 72,
-    description: 'Runs containerized services and handles deployments and scaling.',
+    name: 'INFRA / DEVOPS',
+    level: 78,
+    description: 'Runs services on Kubernetes and maintains CI/CD with Jenkins.',
     type: 'TOOL'
   },
   {
-    name: 'JENKINS',
-    level: 78,
-    description: 'Maintains CI/CD pipelines, automated tests, and release workflows.',
+    name: 'AI DEVELOPMENT',
+    level: 74,
+    description: 'Builds with LLM APIs such as Gemini, including prompt design.',
     type: 'TOOL'
   },
   {
@@ -88,6 +82,12 @@ export const SKILLS: Skill[] = [
     level: 88,
     description: 'Professional working proficiency. Studied in Canada.',
     type: 'TOOL'
+  },
+  {
+    name: 'COFFEE',
+    level: 99,
+    description: 'Fuel for late-night debugging.',
+    type: 'ITEM'
   },
 ];
 export const HISTORY: Experience[] = [

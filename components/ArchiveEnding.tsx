@@ -159,7 +159,8 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                 lines: [
                     '* You let me live.',
                     '* You killed me.',
-                    '* And you found every last secret.',
+                    '* You found every last secret.',
+                    '* In the end, we became friends.',
                 ],
             };
         }

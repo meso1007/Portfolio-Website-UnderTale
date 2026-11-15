@@ -380,7 +380,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                     {/* Footer */}
                                     <div className="relative flex items-center justify-between border-t border-ut-yellow/15 px-7 py-4">
                                         <span className="font-pixel text-[10px] text-gray-600">
-                                            SAVE 03 · DETERMINATION MAX
+                                            SAVE 03
                                         </span>
                                         <span className="font-8bit text-[9px] text-ut-yellow">
                                             — SHOYA
@@ -389,13 +389,6 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
 
                                     {/* Scanlines */}
                                     <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.35)_50%)] bg-[length:100%_4px] opacity-20" />
-                                </div>
-
-                                {/* Seal */}
-                                <div className="absolute -bottom-5 -right-4 flex h-14 w-14 rotate-[-10deg] items-center justify-center rounded-full border border-ut-yellow/40 bg-[#0b0f14] text-ut-yellow shadow-[0_0_20px_rgba(250,204,21,0.12)]">
-                                    <span className="font-8bit text-[7px] leading-tight text-center">
-                                        DET.<br />MAX
-                                    </span>
                                 </div>
                             </div>
                         </>

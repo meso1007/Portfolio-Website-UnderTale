@@ -72,12 +72,6 @@ export const SKILLS: Skill[] = [
     type: 'BACK'
   },
   {
-    name: 'PYTHON',
-    level: 74,
-    description: 'Automates data processing, analysis, and research scripts.',
-    type: 'BACK'
-  },
-  {
     name: 'KUBERNETES',
     level: 72,
     description: 'Runs containerized services and handles deployments and scaling.',
@@ -94,12 +88,6 @@ export const SKILLS: Skill[] = [
     level: 88,
     description: 'Professional working proficiency. Studied in Canada.',
     type: 'TOOL'
-  },
-  {
-    name: 'COFFEE',
-    level: 99,
-    description: 'Fuel for late-night debugging.',
-    type: 'ITEM'
   },
 ];
 export const HISTORY: Experience[] = [

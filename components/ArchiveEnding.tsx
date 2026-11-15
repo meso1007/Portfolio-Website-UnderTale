@@ -157,8 +157,8 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                 badge: 'TRUE ENDING',
                 title: 'THE LAST SAVE',
                 lines: [
-                    '* You have been merciful.',
-                    '* You have been cruel.',
+                    '* You spared me.',
+                    '* You killed me.',
                     '* And you found every last secret.',
                 ],
             };

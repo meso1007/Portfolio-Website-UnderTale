@@ -9,6 +9,7 @@ interface SequentialTypingProps {
   lineClassName?: string;
   accentFrom?: number;
   accentClassName?: string;
+  start?: boolean;
 }
 
 // Reveals one line at a time. A global skip reveals the whole block at once.
@@ -19,6 +20,7 @@ export const SequentialTyping: React.FC<SequentialTypingProps> = ({
   lineClassName = '',
   accentFrom,
   accentClassName = 'text-ut-yellow/90',
+  start = true,
 }) => {
   const [revealed, setRevealed] = useState(0);
 
@@ -30,6 +32,10 @@ export const SequentialTyping: React.FC<SequentialTypingProps> = ({
     const unsubscribe = onSkipTyping(() => setRevealed(lines.length));
     return unsubscribe;
   }, [lines.length]);
+
+  if (!start) {
+    return <div className={className} />;
+  }
 
   return (
     <div className={className}>

@@ -260,6 +260,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                 lines={scene.lines}
                                 speed={48}
                                 className="space-y-3 font-pixel text-base md:text-lg text-white min-h-[7rem]"
+                                start={sceneVisible}
                             />
                         </>
                     )}
@@ -341,13 +342,15 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
 
                                     {/* Body */}
                                     <div className="relative px-7 py-9 md:px-10 md:py-11 text-center">
-                                        <div className="mb-7 font-pixel text-xl md:text-2xl text-ut-yellow">
-                                            <Typewriter
-                                                text="Thank you for staying."
-                                                speed={50}
-                                                enableSound={false}
-                                                className="block"
-                                            />
+                                        <div className="mb-7 min-h-[2.25rem] font-pixel text-xl md:text-2xl text-ut-yellow">
+                                            {sceneVisible && (
+                                                <Typewriter
+                                                    text="Thank you for staying."
+                                                    speed={50}
+                                                    enableSound={false}
+                                                    className="block"
+                                                />
+                                            )}
                                         </div>
 
                                         <SequentialTyping
@@ -355,6 +358,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                             speed={38}
                                             className="mx-auto max-w-md space-y-4 font-pixel text-sm md:text-base leading-relaxed text-gray-200"
                                             accentFrom={5}
+                                            start={sceneVisible}
                                         />
                                     </div>
 
@@ -391,6 +395,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                 lines={['* The stars will remember you.', '* Thank you for playing.']}
                                 speed={48}
                                 className="space-y-3 font-pixel text-base md:text-lg text-white mb-10"
+                                start={sceneVisible}
                             />
 
                             <div className="flex flex-col md:flex-row items-center justify-center gap-4">

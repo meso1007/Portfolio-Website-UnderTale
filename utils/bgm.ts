@@ -3,7 +3,7 @@ import { ensureContext, getAudioContext } from './sound';
 export type BgmTrack = 'NEUTRAL' | 'PACIFIST' | 'GENOCIDE' | 'SECRET' | 'ENDING';
 
 const STORAGE_KEY = 'undertale_bgm_muted';
-const MASTER_VOLUME = 0.16;
+const MASTER_VOLUME = 0.36;
 
 type Step = number | null;
 
@@ -142,10 +142,10 @@ const scheduleAhead = () => {
     const bass = track.bass[index % track.bass.length];
 
     if (lead !== null) {
-      playNote(ctx, destination, lead, nextStepTime, stepDuration * 1.8, 'square', 0.05);
+      playNote(ctx, destination, lead, nextStepTime, stepDuration * 1.8, 'square', 0.06);
     }
     if (bass !== null) {
-      playNote(ctx, destination, bass, nextStepTime, stepDuration * 3.4, 'triangle', 0.09);
+      playNote(ctx, destination, bass, nextStepTime, stepDuration * 3.4, 'triangle', 0.10);
     }
 
     nextStepTime += stepDuration;

@@ -23,6 +23,21 @@ export const ensureContext = async () => {
   return ctx;
 };
 
+// Shared SFX bus so every effect sits at a consistent level against the BGM.
+const SFX_MASTER_VOLUME = 0.6;
+let sfxGain: GainNode | null = null;
+let sfxGainContext: AudioContext | null = null;
+
+const getSfxGain = (ctx: AudioContext): GainNode => {
+  if (!sfxGain || sfxGainContext !== ctx) {
+    sfxGain = ctx.createGain();
+    sfxGainContext = ctx;
+    sfxGain.gain.value = SFX_MASTER_VOLUME;
+    sfxGain.connect(ctx.destination);
+  }
+  return sfxGain;
+};
+
 // 1. The Alert Sound (!)
 export const playEncounter = () => {
   const ctx = getAudioContext();
@@ -62,12 +77,12 @@ export const playEncounter = () => {
   lfo.start(t);
 
   // Volume envelope - Lowered from 0.5 to 0.15
-  gain.gain.setValueAtTime(0.15, t);
+  gain.gain.setValueAtTime(0.12, t);
   gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
 
   osc1.connect(gain);
   osc2.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(getSfxGain(ctx));
 
   // Start both oscillators immediately for the chord effect
   osc1.start(t);
@@ -97,11 +112,11 @@ export const playSelect = () => {
     osc.frequency.setValueAtTime(520, now);
     osc.frequency.setValueAtTime(680, now + 0.03);
     
-    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.setValueAtTime(0.08, now);
     gain.gain.linearRampToValueAtTime(0, now + 0.08);
     
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(getSfxGain(ctx));
     osc.start(now);
     osc.stop(now + 0.1);
   });
@@ -121,12 +136,12 @@ export const playConfirm = () => {
       osc.type = 'square';
       osc.frequency.setValueAtTime(freq, now + i * 0.08);
       
-      gain.gain.setValueAtTime(0.1, now + i * 0.08);
+      gain.gain.setValueAtTime(0.09, now + i * 0.08);
       gain.gain.linearRampToValueAtTime(0.02, now + i * 0.08 + 0.15);
       gain.gain.linearRampToValueAtTime(0, now + i * 0.08 + 0.2);
       
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(getSfxGain(ctx));
       osc.start(now + i * 0.08);
       osc.stop(now + i * 0.08 + 0.25);
     });
@@ -149,11 +164,11 @@ export const playText = () => {
   osc.type = 'square'; 
   osc.frequency.setValueAtTime(700, now); 
   
-  gain.gain.setValueAtTime(0.04, now);
+  gain.gain.setValueAtTime(0.035, now);
   gain.gain.linearRampToValueAtTime(0, now + 0.03);
   
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(getSfxGain(ctx));
   osc.start(now);
   osc.stop(now + 0.04);
 };
@@ -172,12 +187,12 @@ export const playSave = () => {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, now + i * 0.12);
       
-      gain.gain.setValueAtTime(0.1, now + i * 0.12);
+      gain.gain.setValueAtTime(0.09, now + i * 0.12);
       gain.gain.linearRampToValueAtTime(0.05, now + i * 0.12 + 0.2);
       gain.gain.linearRampToValueAtTime(0, now + i * 0.12 + 0.4);
       
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(getSfxGain(ctx));
       osc.start(now + i * 0.12);
       osc.stop(now + i * 0.12 + 0.45);
     });
@@ -199,11 +214,11 @@ export const playMenuMove = () => {
   osc.type = 'square';
   osc.frequency.setValueAtTime(440, now);
   
-  gain.gain.setValueAtTime(0.05, now);
+  gain.gain.setValueAtTime(0.045, now);
   gain.gain.linearRampToValueAtTime(0, now + 0.035);
   
   osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(getSfxGain(ctx));
   osc.start(now);
   osc.stop(now + 0.04);
 };
@@ -221,11 +236,11 @@ export const playCancel = () => {
     osc.frequency.setValueAtTime(520, now);
     osc.frequency.setValueAtTime(400, now + 0.03);
     
-    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.setValueAtTime(0.08, now);
     gain.gain.linearRampToValueAtTime(0, now + 0.1);
     
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(getSfxGain(ctx));
     osc.start(now);
     osc.stop(now + 0.1);
   });
@@ -245,7 +260,7 @@ export const playDamage = () => {
     osc.frequency.setValueAtTime(150, now);
     osc.frequency.linearRampToValueAtTime(50, now + 0.1);
     
-    gain.gain.setValueAtTime(0.5, now);
+    gain.gain.setValueAtTime(0.22, now);
     gain.gain.linearRampToValueAtTime(0, now + 0.15);
     
     // Add noise burst for "crunch"
@@ -257,16 +272,16 @@ export const playDamage = () => {
     const noise = ctx.createBufferSource();
     noise.buffer = buffer;
     const noiseGain = ctx.createGain();
-    noiseGain.gain.setValueAtTime(0.3, now);
+    noiseGain.gain.setValueAtTime(0.12, now);
     noiseGain.gain.linearRampToValueAtTime(0, now + 0.1);
     
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(getSfxGain(ctx));
     osc.start(now);
     osc.stop(now + 0.15);
     
     noise.connect(noiseGain);
-    noiseGain.connect(ctx.destination);
+    noiseGain.connect(getSfxGain(ctx));
     noise.start(now);
   });
 };
@@ -283,11 +298,11 @@ export const playHeal = () => {
     osc.frequency.setValueAtTime(440, now);
     osc.frequency.linearRampToValueAtTime(880, now + 0.2);
     
-    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.setValueAtTime(0.08, now);
     gain.gain.linearRampToValueAtTime(0, now + 0.3);
     
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(getSfxGain(ctx));
     osc.start(now);
     osc.stop(now + 0.3);
   });
@@ -310,11 +325,11 @@ export const playGlitch = () => {
     const node = ctx.createBufferSource();
     node.buffer = buffer;
     const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.setValueAtTime(0.16, now);
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
     
     node.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(getSfxGain(ctx));
     node.start(now);
   });
 };
@@ -333,11 +348,11 @@ export const playHeartbeat = () => {
       osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.55, start + 0.18);
 
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.exponentialRampToValueAtTime(0.35, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.18, start + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.28);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(getSfxGain(ctx));
       osc.start(start);
       osc.stop(start + 0.32);
     };

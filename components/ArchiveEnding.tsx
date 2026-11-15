@@ -16,12 +16,13 @@ interface ArchiveEndingProps {
 
 const MESSAGE_LINES = [
     'Did you have fun?',
-    'I wanted to make a portfolio',
-    'you could explore, not just scroll through.',
-    'If you have an idea or feedback,',
-    "I'd love to hear it. I read every message.",
-    "I'll keep making fun things.",
-    'Maybe the next one will be with you.',
+    'I wanted this to feel like a little world',
+    'you could poke around in,',
+    'not just another portfolio.',
+    'Got an idea, a bug, or just wanna say hi?',
+    'Drop it in the guestbook — I actually read everything.',
+    "I'll keep making weird little things.",
+    "Maybe we'll build the next one together.",
 ];
 
 const STARS = [
@@ -345,7 +346,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                         <div className="mb-7 min-h-[2.25rem] font-pixel text-xl md:text-2xl text-ut-yellow">
                                             {sceneVisible && (
                                                 <Typewriter
-                                                    text="Thank you for staying."
+                                                    text="Thanks for hanging out :)"
                                                     speed={50}
                                                     enableSound={false}
                                                     className="block"
@@ -357,7 +358,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                             lines={MESSAGE_LINES}
                                             speed={38}
                                             className="mx-auto max-w-md space-y-4 font-pixel text-sm md:text-base leading-relaxed text-gray-200"
-                                            accentFrom={5}
+                                            accentFrom={6}
                                             start={sceneVisible}
                                         />
                                     </div>

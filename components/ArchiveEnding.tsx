@@ -15,14 +15,14 @@ interface ArchiveEndingProps {
 }
 
 const MESSAGE_LINES = [
-    'Did you have fun?',
-    'I wanted this to feel like a little world',
-    'you could poke around in,',
+    'Did you enjoy it?',
+    'I wanted this to feel like a small world',
+    'you could explore,',
     'not just another portfolio.',
-    'Got an idea, a bug, or just wanna say hi?',
-    'Drop it in the guestbook — I actually read everything.',
-    "I'll keep making weird little things.",
-    "Maybe we'll build the next one together.",
+    'If you have an idea or feedback,',
+    'please send it through the guestbook. I read every message.',
+    "I'll keep making things I care about.",
+    'Maybe we can build the next one together.',
 ];
 
 const STARS = [
@@ -346,7 +346,7 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                         <div className="mb-7 min-h-[2.25rem] font-pixel text-xl md:text-2xl text-ut-yellow">
                                             {sceneVisible && (
                                                 <Typewriter
-                                                    text="Thanks for hanging out :)"
+                                                    text="Thanks for staying."
                                                     speed={50}
                                                     enableSound={false}
                                                     className="block"

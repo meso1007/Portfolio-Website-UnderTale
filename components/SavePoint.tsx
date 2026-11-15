@@ -75,6 +75,17 @@ export const SavePoint: React.FC = () => {
     fetchEntries();
   }, []);
 
+  // Opened from the ending's SEND FEEDBACK button.
+  useEffect(() => {
+    const openGuestbook = () => {
+      setIsOpen(true);
+      setView('GUESTBOOK');
+      fetchEntries();
+    };
+    window.addEventListener('undertale:open-guestbook', openGuestbook);
+    return () => window.removeEventListener('undertale:open-guestbook', openGuestbook);
+  }, []);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !message) return;
@@ -154,7 +165,7 @@ export const SavePoint: React.FC = () => {
 
       {/* The Save Modal */}
       {isOpen && createPortal(
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/80 z-[130] flex items-center justify-center p-4">
           <div className="w-full max-w-lg border-4 border-white bg-black p-6 relative">
 
             {/* Header */}

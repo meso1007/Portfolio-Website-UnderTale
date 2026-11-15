@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Star, Mail, Github, MessageSquare } from 'lucide-react';
+import { Star, Linkedin, Github, MessageSquare } from 'lucide-react';
 import { SoulHeart } from './SoulHeart';
 import { Typewriter } from './Typewriter';
 import { playConfirm, playHeal, playMenuMove, playSave } from '../utils/sound';
@@ -448,21 +448,26 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                 </p>
                                 <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 font-8bit text-[10px]">
                                     <a
-                                        href="mailto:diegoshoya2017@gmail.com?subject=Let's%20connect"
+                                        href="https://www.linkedin.com/in/shoya-horiuchi-83b785278/"
+                                        target="_blank"
+                                        rel="noreferrer"
                                         onClick={(event) => { event.stopPropagation(); playConfirm(); }}
                                         onMouseEnter={() => playMenuMove()}
                                         className="flex items-center gap-2 text-ut-yellow hover:text-white transition-colors"
                                     >
-                                        <Mail size={12} /> LET'S CONNECT
+                                        <Linkedin size={12} /> LET'S CONNECT
                                     </a>
-                                    <a
-                                        href="mailto:diegoshoya2017@gmail.com?subject=Portfolio%20feedback"
-                                        onClick={(event) => { event.stopPropagation(); playConfirm(); }}
+                                    <button
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            playConfirm();
+                                            window.dispatchEvent(new Event('undertale:open-guestbook'));
+                                        }}
                                         onMouseEnter={() => playMenuMove()}
                                         className="flex items-center gap-2 text-gray-400 hover:text-ut-yellow transition-colors"
                                     >
                                         <MessageSquare size={12} /> SEND FEEDBACK
-                                    </a>
+                                    </button>
                                     <a
                                         href="https://github.com/meso1007"
                                         target="_blank"

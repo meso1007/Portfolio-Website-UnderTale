@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Star, Linkedin, Github, MessageSquare } from 'lucide-react';
 import { SoulHeart } from './SoulHeart';
 import { Typewriter } from './Typewriter';
+import { SequentialTyping } from './SequentialTyping';
 import { playConfirm, playHeal, playMenuMove, playSave } from '../utils/sound';
 import { setBgmTrack } from '../utils/bgm';
 import { isAchievementUnlocked } from '../utils/achievements';
@@ -12,6 +13,16 @@ interface ArchiveEndingProps {
     onStay: () => void;
     onReturnTitle: () => void;
 }
+
+const MESSAGE_LINES = [
+    'Did you have fun?',
+    'I wanted to make a portfolio',
+    'you could explore, not just scroll through.',
+    'If you have an idea or feedback,',
+    "I'd love to hear it. I read every message.",
+    "I'll keep making fun things.",
+    'Maybe the next one will be with you.',
+];
 
 const STARS = [
     { left: '6%', top: '12%', size: 18, delay: '0s' },
@@ -245,17 +256,11 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                             <div className="mb-8 flex justify-center">
                                 <SoulHeart className="w-10 h-10 md:w-12 md:h-12 text-yellow-400 fill-yellow-400 animate-float" />
                             </div>
-                            <div className="space-y-3 font-pixel text-base md:text-lg text-white min-h-[7rem]">
-                                {scene.lines.map((line, index) => (
-                                    <Typewriter
-                                        key={`0-${index}`}
-                                        text={line}
-                                        speed={48}
-                                        enableSound={false}
-                                        className="block"
-                                    />
-                                ))}
-                            </div>
+                            <SequentialTyping
+                                lines={scene.lines}
+                                speed={48}
+                                className="space-y-3 font-pixel text-base md:text-lg text-white min-h-[7rem]"
+                            />
                         </>
                     )}
 
@@ -345,56 +350,12 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                             />
                                         </div>
 
-                                        <div className="mx-auto max-w-md space-y-4 font-pixel text-sm md:text-base leading-relaxed text-gray-200">
-                                            <Typewriter
-                                                text="Thank you for staying."
-                                                speed={38}
-                                                enableSound={false}
-                                                className="block"
-                                            />
-                                            <Typewriter
-                                                text="Did you enjoy it?"
-                                                speed={38}
-                                                enableSound={false}
-                                                className="block"
-                                            />
-                                            <Typewriter
-                                                text="I wanted to make a portfolio you could explore,"
-                                                speed={38}
-                                                enableSound={false}
-                                                className="block"
-                                            />
-                                            <Typewriter
-                                                text="not just scroll through."
-                                                speed={38}
-                                                enableSound={false}
-                                                className="block"
-                                            />
-                                            <Typewriter
-                                                text="If you have an idea or feedback,"
-                                                speed={38}
-                                                enableSound={false}
-                                                className="block"
-                                            />
-                                            <Typewriter
-                                                text="please send it. I read every message."
-                                                speed={38}
-                                                enableSound={false}
-                                                className="block"
-                                            />
-                                            <Typewriter
-                                                text="I will keep making fun things."
-                                                speed={38}
-                                                enableSound={false}
-                                                className="block text-ut-yellow/90"
-                                            />
-                                            <Typewriter
-                                                text="The next one might be with you."
-                                                speed={38}
-                                                enableSound={false}
-                                                className="block text-ut-yellow/90"
-                                            />
-                                        </div>
+                                        <SequentialTyping
+                                            lines={MESSAGE_LINES}
+                                            speed={38}
+                                            className="mx-auto max-w-md space-y-4 font-pixel text-sm md:text-base leading-relaxed text-gray-200"
+                                            accentFrom={5}
+                                        />
                                     </div>
 
                                     {/* Footer */}
@@ -426,10 +387,11 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                             <div className="mb-8 flex justify-center">
                                 <SoulHeart className="w-10 h-10 md:w-12 md:h-12 text-yellow-400 fill-yellow-400 animate-float" />
                             </div>
-                            <div className="space-y-3 font-pixel text-base md:text-lg text-white mb-10">
-                                <Typewriter text="* The stars will remember you." speed={48} enableSound={false} className="block" />
-                                <Typewriter text="* Thank you for playing." speed={48} enableSound={false} className="block" />
-                            </div>
+                            <SequentialTyping
+                                lines={['* The stars will remember you.', '* Thank you for playing.']}
+                                speed={48}
+                                className="space-y-3 font-pixel text-base md:text-lg text-white mb-10"
+                            />
 
                             <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                                 <button

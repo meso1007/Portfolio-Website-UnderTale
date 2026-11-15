@@ -163,7 +163,13 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
     return createPortal(
         <div
             className="fixed inset-0 z-[120] bg-black overflow-y-auto"
-            onClick={() => { if (isTyping()) skipTyping(); }}
+            onClick={() => {
+                if (isTyping()) {
+                    skipTyping();
+                    return;
+                }
+                advance();
+            }}
         >
             {/* Stars */}
             <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">

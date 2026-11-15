@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Star } from 'lucide-react';
+import { Star, Mail, Github, MessageSquare } from 'lucide-react';
 import { SoulHeart } from './SoulHeart';
 import { Typewriter } from './Typewriter';
 import { playConfirm, playHeal, playMenuMove, playSave } from '../utils/sound';
@@ -440,6 +440,40 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                                 >
                                     CLOSE THE FILE
                                 </button>
+                            </div>
+
+                            <div className="mt-10 border-t border-white/10 pt-6">
+                                <p className="font-pixel text-xs text-gray-500 mb-4">
+                                    If you want to build something together, my inbox is open.
+                                </p>
+                                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 font-8bit text-[10px]">
+                                    <a
+                                        href="mailto:diegoshoya2017@gmail.com?subject=Let's%20connect"
+                                        onClick={(event) => { event.stopPropagation(); playConfirm(); }}
+                                        onMouseEnter={() => playMenuMove()}
+                                        className="flex items-center gap-2 text-ut-yellow hover:text-white transition-colors"
+                                    >
+                                        <Mail size={12} /> LET'S CONNECT
+                                    </a>
+                                    <a
+                                        href="mailto:diegoshoya2017@gmail.com?subject=Portfolio%20feedback"
+                                        onClick={(event) => { event.stopPropagation(); playConfirm(); }}
+                                        onMouseEnter={() => playMenuMove()}
+                                        className="flex items-center gap-2 text-gray-400 hover:text-ut-yellow transition-colors"
+                                    >
+                                        <MessageSquare size={12} /> SEND FEEDBACK
+                                    </a>
+                                    <a
+                                        href="https://github.com/meso1007"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        onClick={(event) => { event.stopPropagation(); playConfirm(); }}
+                                        onMouseEnter={() => playMenuMove()}
+                                        className="flex items-center gap-2 text-gray-400 hover:text-ut-yellow transition-colors"
+                                    >
+                                        <Github size={12} /> GITHUB
+                                    </a>
+                                </div>
                             </div>
                         </>
                     )}

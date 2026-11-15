@@ -68,7 +68,7 @@ export const Typewriter: React.FC<TypewriterProps> = ({
   }, [text, speed, onComplete, enableSound]);
 
   return (
-    <span className={`font-pixel text-xl md:text-2xl leading-relaxed whitespace-pre-wrap ${className}`}>
+    <span className={`font-pixel leading-relaxed whitespace-pre-wrap ${className}`}>
       {displayedText}
     </span>
   );

@@ -340,10 +340,10 @@ export const SecretView: React.FC<SecretViewProps> = ({ route, onClose }) => {
             {/* Developer message */}
             <Panel icon={<MessageSquare size={18} />} title="DEVELOPER'S MESSAGE">
                 <div className="space-y-2 font-pixel text-white text-sm md:text-base">
-                    <Typewriter text="* Thanks for exploring every corner of this portfolio." speed={24} className="block" enableSound={false} />
-                    <Typewriter text="* It is a small site, but every screen was hand-built." speed={24} className="block" enableSound={false} />
-                    <Typewriter text="* The best part of engineering is still the people you meet." speed={24} className="block" enableSound={false} />
-                    <Typewriter text="* If you want to build something, my inbox is open." speed={24} className="block" enableSound={false} />
+                    <Typewriter text="* Thanks for exploring every corner of this portfolio." speed={24} className="block text-base md:text-lg" enableSound={false} />
+                    <Typewriter text="* It is a small site, but every screen was hand-built." speed={24} className="block text-base md:text-lg" enableSound={false} />
+                    <Typewriter text="* The best part of engineering is still the people you meet." speed={24} className="block text-base md:text-lg" enableSound={false} />
+                    <Typewriter text="* If you want to build something, my inbox is open." speed={24} className="block text-base md:text-lg" enableSound={false} />
                 </div>
             </Panel>
 

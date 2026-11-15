@@ -6,6 +6,7 @@ import { Typewriter } from './Typewriter';
 import { GuestbookEntry } from '../types';
 import { API_ENDPOINTS } from '../config/api';
 import { unlockAchievement } from '../utils/achievements';
+import { SoulHeart } from './SoulHeart';
 import { PLAYER_LV } from '../constants';
 
 // API Configuration
@@ -41,7 +42,8 @@ export const SavePoint: React.FC = () => {
   const [entries, setEntries] = useState<GuestbookEntry[]>(SEED_ENTRIES);
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
-  const [view, setView] = useState<'MENU' | 'GUESTBOOK'>('MENU');
+  const [view, setView] = useState<'MENU' | 'GUESTBOOK' | 'THANKS'>('MENU');
+  const [openedFromEnding, setOpenedFromEnding] = useState(false);
 
   // Connection State
   const [isOffline, setIsOffline] = useState(false);
@@ -78,6 +80,7 @@ export const SavePoint: React.FC = () => {
   // Opened from the ending's SEND FEEDBACK button.
   useEffect(() => {
     const openGuestbook = () => {
+      setOpenedFromEnding(true);
       setIsOpen(true);
       setView('GUESTBOOK');
       fetchEntries();
@@ -134,18 +137,21 @@ export const SavePoint: React.FC = () => {
     unlockAchievement('guestbook');
     setName("");
     setMessage("");
-    setView('MENU'); // Return to save confirmation screen
+    setView(openedFromEnding ? 'THANKS' : 'MENU');
   };
 
   const handleOpen = () => {
     playSave();
+    setOpenedFromEnding(false);
     setIsOpen(true);
+    setView('MENU');
     fetchEntries(); // Refresh on open
   };
 
   const handleClose = () => {
     playConfirm();
     setIsOpen(false);
+    setOpenedFromEnding(false);
     setView('MENU');
   };
 
@@ -171,7 +177,11 @@ export const SavePoint: React.FC = () => {
             {/* Header */}
             <div className="flex justify-between items-baseline mb-6 border-b-2 border-white pb-2">
               <span className="font-8bit text-ut-yellow text-lg">
-                {view === 'MENU' ? 'SAVE POINT' : 'GUESTBOOK'}
+                {view === 'MENU'
+                  ? 'SAVE POINT'
+                  : view === 'GUESTBOOK'
+                    ? (openedFromEnding ? 'FEEDBACK' : 'GUESTBOOK')
+                    : 'FEEDBACK SENT'}
               </span>
               <span className="font-pixel text-gray-400 text-sm">
                 {view === 'MENU' ? `LV ${PLAYER_LV}` : `${entries.length} RECORDS`}
@@ -276,11 +286,37 @@ export const SavePoint: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={() => setView('MENU')}
+                  onClick={() => {
+                    if (openedFromEnding) {
+                      handleClose();
+                    } else {
+                      setView('MENU');
+                    }
+                  }}
                   className="mt-4 text-gray-400 hover:text-white font-pixel text-sm text-center"
                   onMouseEnter={() => playMenuMove()}
                 >
-                  [ BACK ]
+                  {openedFromEnding ? '[ BACK TO ENDING ]' : '[ BACK ]'}
+                </button>
+              </div>
+            )}
+
+            {view === 'THANKS' && (
+              <div className="flex flex-col items-center justify-center text-center h-[320px]">
+                <div className="mb-5">
+                  <SoulHeart className="w-12 h-12 text-yellow-400 fill-yellow-400" />
+                </div>
+                <p className="font-8bit text-ut-yellow text-sm mb-4">FEEDBACK SENT</p>
+                <div className="font-pixel text-white text-lg space-y-2 mb-8">
+                  <p>* Your message has been saved.</p>
+                  <p>* I read every one. Thank you.</p>
+                </div>
+                <button
+                  onClick={handleClose}
+                  onMouseEnter={() => playMenuMove()}
+                  className="font-8bit text-xs border-2 border-ut-yellow text-ut-yellow px-6 py-3 hover:bg-ut-yellow hover:text-black transition-colors"
+                >
+                  RETURN TO ENDING
                 </button>
               </div>
             )}

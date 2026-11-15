@@ -87,6 +87,19 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
         };
     }, []);
 
+    const handleAdvanceClick = () => {
+        if (!started) {
+            setStarted(true);
+            setSceneVisible(true);
+            return;
+        }
+        if (isTyping()) {
+            skipTyping();
+            return;
+        }
+        advance();
+    };
+
     const advance = () => {
         if (!started || transitioningRef.current) return;
         if (isTyping()) {
@@ -161,16 +174,14 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
     const showChoices = step === 3;
 
     return createPortal(
-        <div
-            className="fixed inset-0 z-[120] bg-black overflow-y-auto"
-            onClick={() => {
-                if (isTyping()) {
-                    skipTyping();
-                    return;
-                }
-                advance();
-            }}
-        >
+        <div className="fixed inset-0 z-[120] bg-black overflow-y-auto">
+            {/* Full-screen click surface */}
+            <button
+                type="button"
+                aria-label="Continue"
+                className="absolute inset-0 z-0 h-full w-full cursor-pointer bg-transparent"
+                onClick={handleAdvanceClick}
+            />
             {/* Stars */}
             <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
                 {STARS.map((star, index) => (
@@ -215,7 +226,10 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
                 ))}
             </div>
 
-            <div className="relative min-h-full flex items-center justify-center px-6 py-16">
+            <div
+                className="relative z-10 min-h-full flex items-center justify-center px-6 py-16"
+                onClick={handleAdvanceClick}
+            >
                 <div
                     className={`relative w-full max-w-2xl text-center transition-opacity duration-[1200ms] ${started && sceneVisible ? 'opacity-100' : 'opacity-0'}`}
                 >
@@ -432,7 +446,13 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
 
                     {/* Progress + credits */}
                     {!showChoices && (
-                        <div className="mt-10 flex items-center justify-center gap-2">
+                        <p className="mt-6 font-pixel text-[10px] text-gray-600">
+                            CLICK OR PRESS SPACE TO CONTINUE
+                        </p>
+                    )}
+
+                    {!showChoices && (
+                        <div className="mt-4 flex items-center justify-center gap-2">
                             {[0, 1, 2, 3].map((dot) => (
                                 <span
                                     key={dot}

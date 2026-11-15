@@ -3,7 +3,7 @@ import { ensureContext, getAudioContext } from './sound';
 export type BgmTrack = 'NEUTRAL' | 'PACIFIST' | 'GENOCIDE' | 'SECRET' | 'ENDING';
 
 const STORAGE_KEY = 'undertale_bgm_muted';
-const MASTER_VOLUME = 0.36;
+const MASTER_VOLUME = 0.28;
 
 type Step = number | null;
 

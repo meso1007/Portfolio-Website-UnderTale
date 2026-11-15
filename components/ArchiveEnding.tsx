@@ -347,43 +347,49 @@ export const ArchiveEnding: React.FC<ArchiveEndingProps> = ({ onStay, onReturnTi
 
                                         <div className="mx-auto max-w-md space-y-4 font-pixel text-sm md:text-base leading-relaxed text-gray-200">
                                             <Typewriter
-                                                text="You saw every room, every ending,"
+                                                text="Thank you for staying."
                                                 speed={38}
                                                 enableSound={false}
                                                 className="block"
                                             />
                                             <Typewriter
-                                                text="every version of me."
+                                                text="Did you enjoy it?"
                                                 speed={38}
                                                 enableSound={false}
                                                 className="block"
                                             />
                                             <Typewriter
-                                                text="I built this place because I was afraid"
+                                                text="I wanted to make a portfolio you could explore,"
                                                 speed={38}
                                                 enableSound={false}
                                                 className="block"
                                             />
                                             <Typewriter
-                                                text="that nothing I made would last."
+                                                text="not just scroll through."
                                                 speed={38}
                                                 enableSound={false}
                                                 className="block"
                                             />
                                             <Typewriter
-                                                text="You made it last for a little while."
+                                                text="If you have an idea or feedback,"
                                                 speed={38}
                                                 enableSound={false}
                                                 className="block"
                                             />
                                             <Typewriter
-                                                text="Keep building."
+                                                text="please send it. I read every message."
+                                                speed={38}
+                                                enableSound={false}
+                                                className="block"
+                                            />
+                                            <Typewriter
+                                                text="I will keep making fun things."
                                                 speed={38}
                                                 enableSound={false}
                                                 className="block text-ut-yellow/90"
                                             />
                                             <Typewriter
-                                                text="The next save is yours."
+                                                text="The next one might be with you."
                                                 speed={38}
                                                 enableSound={false}
                                                 className="block text-ut-yellow/90"
